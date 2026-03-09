@@ -24,4 +24,25 @@ final class ProcessServiceTests: XCTestCase {
         let result = await service.canKillProcess(pid: -1)
         XCTAssertFalse(result)
     }
+
+    func testCannotKillProcessOwnedByOtherUser() async {
+        let service = ProcessService()
+
+        // PID 1 is launchd, owned by root
+        let result = await service.canKillProcess(pid: 1)
+        XCTAssertFalse(result, "Should not be able to kill processes owned by other users")
+    }
+
+    func testKillProcessThrowsForUnownedProcess() async {
+        let service = ProcessService()
+
+        do {
+            try await service.killProcess(pid: 1) // launchd
+            XCTFail("Should have thrown permissionDenied")
+        } catch ProcessServiceError.permissionDenied {
+            // Expected
+        } catch {
+            XCTFail("Wrong error type: \(error)")
+        }
+    }
 }
