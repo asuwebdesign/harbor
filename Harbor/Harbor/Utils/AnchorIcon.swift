@@ -8,6 +8,7 @@ import AppKit
 enum AnchorIcon {
     /// Creates a custom anchor icon for the menubar based on the Lucide anchor SVG
     /// Reference: https://lucide.dev/icons/anchor
+    /// SVG viewBox: 0 0 24 24
     static func create(size: CGSize = CGSize(width: 18, height: 18)) -> NSImage {
         let image = NSImage(size: size)
 
@@ -25,55 +26,69 @@ enum AnchorIcon {
         NSGraphicsContext.current?.saveGraphicsState()
         transform.concat()
 
+        // Flip Y-axis to match SVG coordinate system (Y grows downward in SVG, upward in AppKit)
+        let flipTransform = NSAffineTransform()
+        flipTransform.translateX(by: 0, yBy: 24)
+        flipTransform.scaleX(by: 1, yBy: -1)
+        flipTransform.concat()
+
         // Use template color (will be automatically tinted by system)
         NSColor.black.setStroke()
 
         // Stroke width of 2px (from SVG)
         let lineWidth: CGFloat = 2.0
 
-        // Path 1: Vertical line (M12 22V8) - from bottom to top where circle starts
+        // Path 1: Vertical line (M12 6v16) - from (12,6) to (12,22)
         let verticalLine = NSBezierPath()
         verticalLine.lineWidth = lineWidth
         verticalLine.lineCapStyle = .round
         verticalLine.lineJoinStyle = .round
-        verticalLine.move(to: NSPoint(x: 12, y: 22))
-        verticalLine.line(to: NSPoint(x: 12, y: 8))
+        verticalLine.move(to: NSPoint(x: 12, y: 6))
+        verticalLine.line(to: NSPoint(x: 12, y: 22))
         verticalLine.stroke()
 
-        // Path 2: Anchor arms (M5 12H2a10 10 0 0 0 20 0h-3)
-        // This draws the curved bottom part of the anchor
+        // Path 2: Anchor arms (m19 13 l2-1 a9 9 0 0 1-18 0 l2 1)
         let armsPath = NSBezierPath()
         armsPath.lineWidth = lineWidth
         armsPath.lineCapStyle = .round
         armsPath.lineJoinStyle = .round
 
-        // Start at left arm
-        armsPath.move(to: NSPoint(x: 5, y: 12))
-        armsPath.line(to: NSPoint(x: 2, y: 12))
+        // m19 13 - move to (19, 13)
+        armsPath.move(to: NSPoint(x: 19, y: 13))
+        // l2-1 - line relative: +2 x, -1 y → (21, 12)
+        armsPath.line(to: NSPoint(x: 21, y: 12))
 
-        // Arc for the anchor bottom (radius 10, center at x:12, y:12)
-        // SVG arc: a10 10 0 0 0 20 0
-        // This is an arc with radius 10, from current point, going 20 units right
+        // a9 9 0 0 1-18 0 - arc with radius 9, sweep flag 1, relative end: -18 x, 0 y
+        // From (21, 12) to (3, 12)
         armsPath.appendArc(
             withCenter: NSPoint(x: 12, y: 12),
-            radius: 10,
-            startAngle: 180, // Start at left (180 degrees)
-            endAngle: 0,     // End at right (0 degrees)
-            clockwise: true
+            radius: 9,
+            startAngle: 0,
+            endAngle: 180,
+            clockwise: false
         )
 
-        // Right arm
-        armsPath.line(to: NSPoint(x: 22, y: 12))
+        // l2 1 - line relative: +2 x, +1 y → (5, 13)
+        armsPath.line(to: NSPoint(x: 5, y: 13))
         armsPath.stroke()
 
-        // Path 3: Circle at top (cx="12" cy="5" r="3")
+        // Path 3: Horizontal crossbar (M9 11h6) - from (9,11) to (15,11)
+        let crossbar = NSBezierPath()
+        crossbar.lineWidth = lineWidth
+        crossbar.lineCapStyle = .round
+        crossbar.lineJoinStyle = .round
+        crossbar.move(to: NSPoint(x: 9, y: 11))
+        crossbar.line(to: NSPoint(x: 15, y: 11))
+        crossbar.stroke()
+
+        // Path 4: Circle at top (cx="12" cy="4" r="2")
         let circle = NSBezierPath()
         circle.lineWidth = lineWidth
         circle.lineCapStyle = .round
         circle.lineJoinStyle = .round
         circle.appendArc(
-            withCenter: NSPoint(x: 12, y: 5),
-            radius: 3,
+            withCenter: NSPoint(x: 12, y: 4),
+            radius: 2,
             startAngle: 0,
             endAngle: 360,
             clockwise: false
