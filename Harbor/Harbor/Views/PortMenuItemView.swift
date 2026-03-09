@@ -64,8 +64,7 @@ struct PortMenuItemView: View {
                 HStack(spacing: 4) {
                     Button(action: onOpenInFinder) {
                         HStack(spacing: 4) {
-                            Image(systemName: "folder")
-                                .font(.system(size: 16))
+                            FolderIcon()
                             Text("Finder")
                                 .font(.system(size: 11))
                         }
@@ -78,8 +77,7 @@ struct PortMenuItemView: View {
 
                     Button(action: onStop) {
                         HStack(spacing: 4) {
-                            Image(systemName: "stop.fill")
-                                .font(.system(size: 16))
+                            StopCircleIcon()
                             Text("Stop")
                                 .font(.system(size: 11))
                         }

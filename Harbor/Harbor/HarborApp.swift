@@ -20,6 +20,7 @@ struct HarborApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var settingsWindow: NSWindow?
+    private var aboutWindow: NSWindow?
     private let viewModel = PortViewModel()
     private let settingsViewModel = SettingsViewModel()
 
@@ -188,9 +189,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let window = NSWindow(contentViewController: hostingController)
             window.title = "Harbor Settings"
             window.styleMask = [.titled, .closable]
-            window.center()
 
             settingsWindow = window
+        }
+
+        // Center on screen every time it's shown
+        if let screen = NSScreen.main {
+            let screenFrame = screen.visibleFrame
+            let windowFrame = settingsWindow!.frame
+            let x = screenFrame.midX - windowFrame.width / 2
+            let y = screenFrame.midY - windowFrame.height / 2
+            settingsWindow?.setFrameOrigin(NSPoint(x: x, y: y))
         }
 
         settingsWindow?.makeKeyAndOrderFront(nil)
@@ -198,11 +207,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func showAbout() {
-        NSApp.orderFrontStandardAboutPanel(options: [
-            .applicationName: "Harbor",
-            .applicationVersion: "1.0.0",
-            .credits: NSAttributedString(string: "A native macOS menubar app for managing localhost development servers")
-        ])
+        if aboutWindow == nil {
+            let aboutView = AboutView()
+            let hostingController = NSHostingController(rootView: aboutView)
+
+            let window = NSWindow(contentViewController: hostingController)
+            window.title = "About Harbor"
+            window.styleMask = [.titled, .closable]
+
+            aboutWindow = window
+        }
+
+        // Center on screen every time it's shown
+        if let screen = NSScreen.main {
+            let screenFrame = screen.visibleFrame
+            let windowFrame = aboutWindow!.frame
+            let x = screenFrame.midX - windowFrame.width / 2
+            let y = screenFrame.midY - windowFrame.height / 2
+            aboutWindow?.setFrameOrigin(NSPoint(x: x, y: y))
+        }
+
+        aboutWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @objc func quit() {
