@@ -15,7 +15,7 @@ final class PortViewModel {
 
     private let scanner = PortScannerService()
     private let processService = ProcessService()
-    nonisolated(unsafe) private var scanTimer: Timer?
+    nonisolated private var scanTimer: Timer?
 
     init() {
         startAutoRefresh()
