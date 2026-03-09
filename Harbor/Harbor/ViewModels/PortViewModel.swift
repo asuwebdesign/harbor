@@ -15,7 +15,7 @@ final class PortViewModel {
 
     private let scanner = PortScannerService()
     private let processService = ProcessService()
-    private var scanTimer: Timer?
+    nonisolated(unsafe) private var scanTimer: Timer?
 
     init() {
         startAutoRefresh()
@@ -41,7 +41,7 @@ final class PortViewModel {
     }
 
     /// Stops automatic port scanning
-    func stopAutoRefresh() {
+    nonisolated func stopAutoRefresh() {
         scanTimer?.invalidate()
         scanTimer = nil
     }
@@ -65,7 +65,7 @@ final class PortViewModel {
     }
 
     /// Stops all active ports with confirmation
-    func stopAllPorts() async throws {
+    func stopAllPorts() async {
         for port in activePorts {
             try? await processService.killProcess(pid: Int32(port.pid))
         }
