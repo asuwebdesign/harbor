@@ -62,20 +62,26 @@ struct PortMenuItemView: View {
 
             // Right actions (vertically centered, text labels)
             if isHovered {
-                HStack(spacing: 8) {
+                HStack(spacing: 4) {
                     Button(action: onOpenInFinder) {
                         Text("Finder")
                             .font(.system(size: 11))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
                     }
-                    .buttonStyle(.borderless)
-                    .controlSize(.small)
+                    .buttonStyle(.plain)
+                    .background(Color.primary.opacity(0.08))
+                    .cornerRadius(4)
 
                     Button(action: onStop) {
                         Text("Stop")
                             .font(.system(size: 11))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
                     }
-                    .buttonStyle(.borderless)
-                    .controlSize(.small)
+                    .buttonStyle(.plain)
+                    .background(Color.primary.opacity(0.08))
+                    .cornerRadius(4)
                 }
                 .padding(.trailing, 8)
                 .transition(.opacity)
