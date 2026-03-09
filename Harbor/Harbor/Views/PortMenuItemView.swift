@@ -63,20 +63,28 @@ struct PortMenuItemView: View {
             if isHovered {
                 HStack(spacing: 4) {
                     Button(action: onOpenInFinder) {
-                        Text("Finder")
-                            .font(.system(size: 11))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
+                        HStack(spacing: 4) {
+                            Image(systemName: "folder")
+                                .font(.system(size: 16))
+                            Text("Finder")
+                                .font(.system(size: 11))
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
                     }
                     .buttonStyle(.plain)
                     .background(Color.primary.opacity(0.08))
                     .cornerRadius(4)
 
                     Button(action: onStop) {
-                        Text("Stop")
-                            .font(.system(size: 11))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
+                        HStack(spacing: 4) {
+                            Image(systemName: "stop.fill")
+                                .font(.system(size: 16))
+                            Text("Stop")
+                                .font(.system(size: 11))
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
                     }
                     .buttonStyle(.plain)
                     .background(Color.primary.opacity(0.08))
@@ -124,10 +132,10 @@ class PortMenuItem: NSMenuItem {
                 onOpenInFinder: onOpenInFinder,
                 onStop: onStop
             )
-            .padding(.horizontal, 4) // 4px margin on each side
+            .padding(.horizontal, 8) // 8px margin on each side to match other menu items
         )
 
-        hostingView.frame = NSRect(x: 0, y: 0, width: 328, height: 64) // 320 + 8 for margins
+        hostingView.frame = NSRect(x: 0, y: 0, width: 336, height: 64) // 320 + 16 for margins
         self.view = hostingView
     }
 
