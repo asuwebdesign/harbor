@@ -93,6 +93,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         }
                         self?.statusItem.menu = nil
                     },
+                    onOpenInFinder: { [weak self] in
+                        let url = URL(fileURLWithPath: portInfo.workingDirectory)
+                        NSWorkspace.shared.open(url)
+                        self?.statusItem.menu = nil
+                    },
                     onStop: { [weak self] in
                         Task {
                             try? await self?.viewModel.stopPort(portInfo)
