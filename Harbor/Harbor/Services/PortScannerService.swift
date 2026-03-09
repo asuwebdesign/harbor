@@ -155,6 +155,34 @@ actor PortScannerService {
     }
 
     private func getWorkingDirectory(pid: Int32) async -> String? {
+        // Try pwdx first (more reliable)
+        let pwdxProcess = Process()
+        pwdxProcess.executableURL = URL(fileURLWithPath: "/usr/sbin/pwdx")
+        pwdxProcess.arguments = ["\(pid)"]
+
+        let pwdxPipe = Pipe()
+        pwdxProcess.standardOutput = pwdxPipe
+        pwdxProcess.standardError = Pipe()
+
+        do {
+            try pwdxProcess.run()
+            pwdxProcess.waitUntilExit()
+
+            if pwdxProcess.terminationStatus == 0 {
+                let data = pwdxPipe.fileHandleForReading.readDataToEndOfFile()
+                if let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                    // pwdx output format: "PID: /path/to/directory"
+                    let components = output.split(separator: ":", maxSplits: 1)
+                    if components.count == 2 {
+                        return String(components[1]).trimmingCharacters(in: .whitespaces)
+                    }
+                }
+            }
+        } catch {
+            // Fall through to lsof method
+        }
+
+        // Fallback to lsof
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof")
         process.arguments = ["-a", "-p", "\(pid)", "-d", "cwd", "-Fn"]
