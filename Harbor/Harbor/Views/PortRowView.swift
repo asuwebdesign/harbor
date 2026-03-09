@@ -54,8 +54,6 @@ struct PortRowView: View {
                         }
                     }
                 }
-            }
-        }
 
                 // Line 2: Working directory path
                 Text(portInfo.workingDirectory)
