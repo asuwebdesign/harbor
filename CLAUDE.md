@@ -95,6 +95,8 @@ Sanitization removes:
 - ANSI escape sequences
 - Excessive whitespace
 
+**Folder Name Format**: The `folderName` property returns **parent/child format** (e.g., "Sites/harbor" not just "harbor"). This shows the last two path components if available. Always use `sanitizedFolderName` in the UI.
+
 ### Custom Icons
 
 Icons use SwiftUI `Canvas` with exact SVG path coordinates (not SF Symbols where custom design is needed):
@@ -142,6 +144,7 @@ npm run dev  # or equivalent
 - ViewModels are marked `@MainActor`
 - Constants enum is `@MainActor` with `nonisolated static` properties
 - Timer closures use `[weak self]` and avoid direct property access
+- @objc methods calling async code must use `Task { @MainActor in ... }` not just `Task { ... }`
 
 **Special characters in UI**: Always use sanitized properties from `PortInfo` (e.g., `sanitizedFolderName` not `folderName`)
 

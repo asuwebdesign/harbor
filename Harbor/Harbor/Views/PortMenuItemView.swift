@@ -72,7 +72,7 @@ struct PortMenuItemView: View {
                         .padding(.vertical, 4)
                     }
                     .buttonStyle(.plain)
-                    .background(Color.primary.opacity(0.08))
+                    .background(.ultraThinMaterial)
                     .cornerRadius(4)
 
                     Button(action: onStop) {
@@ -85,12 +85,10 @@ struct PortMenuItemView: View {
                         .padding(.vertical, 4)
                     }
                     .buttonStyle(.plain)
-                    .background(Color.primary.opacity(0.08))
+                    .background(.ultraThinMaterial)
                     .cornerRadius(4)
                 }
-                .padding(8)
-                .background(.ultraThinMaterial)
-                .cornerRadius(6)
+                .padding(.trailing, 8)
                 .transition(.opacity)
             }
         }

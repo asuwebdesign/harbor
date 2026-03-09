@@ -189,7 +189,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
-            Task {
+            Task { @MainActor in
                 await viewModel.stopAllPorts()
             }
         }
