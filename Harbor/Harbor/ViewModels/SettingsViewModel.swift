@@ -14,7 +14,22 @@ final class SettingsViewModel {
     }
 
     var launchAtLogin: Bool {
-        didSet { saveSettings() }
+        didSet {
+            saveSettings()
+
+            // Update launch at login status
+            do {
+                if launchAtLogin {
+                    try LaunchAtLogin.enable()
+                } else {
+                    try LaunchAtLogin.disable()
+                }
+            } catch {
+                print("Failed to update launch at login: \(error)")
+                // Revert on failure
+                launchAtLogin = LaunchAtLogin.isEnabled()
+            }
+        }
     }
 
     private let stateManager: AppStateManager
@@ -24,7 +39,9 @@ final class SettingsViewModel {
 
         let settings = stateManager.loadSettings()
         self.showBadgeCount = settings.showBadgeCount
-        self.launchAtLogin = settings.launchAtLogin
+
+        // Get actual launch at login status from system
+        self.launchAtLogin = LaunchAtLogin.isEnabled()
     }
 
     private func saveSettings() {
