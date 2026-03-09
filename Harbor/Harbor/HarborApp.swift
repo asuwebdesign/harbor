@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "building.2.crop.circle", accessibilityDescription: "Harbor")
+            button.image = AnchorIcon.create(size: CGSize(width: 18, height: 18))
             button.action = #selector(showMenu)
         }
 
