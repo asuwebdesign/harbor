@@ -19,8 +19,6 @@ struct HarborApp: App {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
-    private var menuBarWindow: MenuBarWindow!
-    private var eventMonitor: Any?
     private var settingsWindow: NSWindow?
     private let viewModel = PortViewModel()
     private let settingsViewModel = SettingsViewModel()
@@ -31,48 +29,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: "building.2.crop.circle", accessibilityDescription: "Harbor")
-            button.action = #selector(toggleMenu)
-            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+            button.action = #selector(showMenu)
         }
 
-        // Create native menubar window with Liquid Glass aesthetic
-        let windowRect = NSRect(x: 0, y: 0, width: Constants.popoverWidth, height: Constants.popoverMinHeight)
-        menuBarWindow = MenuBarWindow(
-            contentRect: windowRect,
-            backing: .buffered,
-            defer: false
-        )
-
-        // Embed SwiftUI content
-        let hostingView = MenuBarHostingController(
-            rootView: AnyView(
-                PopoverView()
-                    .environment(viewModel)
-                    .environment(settingsViewModel)
-            )
-        )
-
-        if let visualEffectView = menuBarWindow.contentView as? NSVisualEffectView {
-            hostingView.view.frame = visualEffectView.bounds
-            hostingView.view.autoresizingMask = [.width, .height]
-            visualEffectView.addSubview(hostingView.view)
-        }
-
-        // Monitor clicks outside window to dismiss
-        setupEventMonitor()
+        // Build initial menu
+        buildMenu()
 
         // Update badge based on settings
         Task { @MainActor in
             updateBadge()
         }
 
-        // Observe port changes to update badge
+        // Observe port changes to rebuild menu and update badge
         NotificationCenter.default.addObserver(
             forName: NSNotification.Name("PortsDidUpdate"),
             object: nil,
             queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
+                self?.buildMenu()
                 self?.updateBadge()
             }
         }
@@ -89,64 +64,112 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc func toggleMenu(_ sender: NSStatusBarButton) {
-        guard let event = NSApp.currentEvent else { return }
-
-        if event.type == .rightMouseUp {
-            showContextMenu()
-        } else {
-            if menuBarWindow.isVisible {
-                hideMenu()
-            } else {
-                showMenu()
-            }
-        }
-    }
-
-    private func showMenu() {
-        guard let button = statusItem.button else { return }
-
-        // Refresh ports before showing
+    @objc func showMenu() {
+        // Refresh ports before showing menu
         Task {
             await viewModel.scanPorts()
             await MainActor.run {
-                menuBarWindow.show(below: button)
+                buildMenu()
+                statusItem.button?.performClick(nil)
             }
         }
     }
 
-    private func hideMenu() {
-        menuBarWindow.hide()
-    }
-
-    private func setupEventMonitor() {
-        // Monitor for clicks outside the window
-        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
-            guard let self = self, self.menuBarWindow.isVisible else { return }
-
-            // Check if click is outside the window
-            let clickLocation = event.locationInWindow
-            let windowFrame = self.menuBarWindow.frame
-
-            if !NSPointInRect(NSEvent.mouseLocation, windowFrame) {
-                self.hideMenu()
-            }
-        }
-    }
-
-    @objc func showContextMenu() {
+    private func buildMenu() {
         let menu = NSMenu()
 
-        menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
+        // Add port items
+        if viewModel.activePorts.isEmpty {
+            let emptyItem = NSMenuItem(title: "No active ports", action: nil, keyEquivalent: "")
+            emptyItem.isEnabled = false
+            menu.addItem(emptyItem)
+        } else {
+            for portInfo in viewModel.activePorts {
+                let portItem = PortMenuItem(
+                    portInfo: portInfo,
+                    onOpen: { [weak self] in
+                        if let url = URL(string: "http://localhost:\(portInfo.port)") {
+                            NSWorkspace.shared.open(url)
+                        }
+                        self?.statusItem.menu = nil
+                    },
+                    onStop: { [weak self] in
+                        Task {
+                            try? await self?.viewModel.stopPort(portInfo)
+                        }
+                        self?.statusItem.menu = nil
+                    }
+                )
+                menu.addItem(portItem)
+            }
+
+            // Add Stop All if multiple ports
+            if viewModel.activePorts.count > 1 {
+                menu.addItem(NSMenuItem.separator())
+
+                let stopAllItem = NSMenuItem(
+                    title: "Stop All (\(viewModel.activePorts.count) servers)",
+                    action: #selector(stopAllPorts),
+                    keyEquivalent: ""
+                )
+                stopAllItem.target = self
+                menu.addItem(stopAllItem)
+            }
+        }
+
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Quit Harbor", action: #selector(quit), keyEquivalent: "q"))
+
+        // Settings
+        let settingsItem = NSMenuItem(
+            title: "Settings...",
+            action: #selector(openSettings),
+            keyEquivalent: ","
+        )
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+
+        // About
+        let aboutItem = NSMenuItem(
+            title: "About Harbor",
+            action: #selector(showAbout),
+            keyEquivalent: ""
+        )
+        aboutItem.target = self
+        menu.addItem(aboutItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        // Quit
+        let quitItem = NSMenuItem(
+            title: "Quit Harbor",
+            action: #selector(quit),
+            keyEquivalent: "q"
+        )
+        quitItem.target = self
+        menu.addItem(quitItem)
 
         statusItem.menu = menu
-        statusItem.button?.performClick(nil)
 
-        // Reset menu to nil so left-click still works
+        // Reset menu to nil after it's shown so we can rebuild next time
         DispatchQueue.main.async {
             self.statusItem.menu = nil
+        }
+    }
+
+    @objc func stopAllPorts() {
+        // Show confirmation alert
+        let alert = NSAlert()
+        alert.messageText = "Stop All Servers?"
+        alert.informativeText = "This will stop \(viewModel.activePorts.count) running servers:\n\(viewModel.activePorts.map { $0.folderName }.joined(separator: ", "))"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Stop All")
+        alert.addButton(withTitle: "Cancel")
+
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            Task {
+                await viewModel.stopAllPorts()
+            }
         }
     }
 
@@ -168,6 +191,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    @objc func showAbout() {
+        NSApp.orderFrontStandardAboutPanel(options: [
+            .applicationName: "Harbor",
+            .applicationVersion: "1.0.0",
+            .credits: NSAttributedString(string: "A native macOS menubar app for managing localhost development servers")
+        ])
+    }
+
     @objc func quit() {
         NSApp.terminate(nil)
     }
@@ -180,12 +211,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.title = " \(viewModel.activePorts.count)"
         } else {
             button.title = ""
-        }
-    }
-
-    deinit {
-        if let monitor = eventMonitor {
-            NSEvent.removeMonitor(monitor)
         }
     }
 }
