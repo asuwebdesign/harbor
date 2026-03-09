@@ -7,18 +7,21 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var viewModel = SettingsViewModel()
+    @Environment(SettingsViewModel.self) private var viewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            Text("Settings")
-                .font(.title2)
-                .bold()
+            VStack(alignment: .leading, spacing: 24) {
+                Text("Settings")
+                    .font(.title2)
+                    .bold()
+                    .padding(.top, 4)
 
-            VStack(alignment: .leading, spacing: 16) {
-                Toggle("Show badge count in menubar", isOn: $viewModel.showBadgeCount)
+                VStack(alignment: .leading, spacing: 16) {
+                    Toggle("Show badge count in menubar", isOn: $viewModel.showBadgeCount)
 
-                Toggle("Launch Harbor at login", isOn: $viewModel.launchAtLogin)
+                    Toggle("Launch Harbor at login", isOn: $viewModel.launchAtLogin)
+                }
             }
 
             Spacer()
@@ -31,12 +34,16 @@ struct SettingsView: View {
                 }
                 .keyboardShortcut(.defaultAction)
             }
+            .padding(.bottom, 4)
         }
         .padding(24)
-        .frame(width: 350, height: 180)
+        .frame(width: 350, height: 200)
     }
 }
 
 #Preview {
+    @Previewable @State var settingsViewModel = SettingsViewModel()
+
     SettingsView()
+        .environment(settingsViewModel)
 }

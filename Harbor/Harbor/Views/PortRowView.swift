@@ -12,50 +12,70 @@ struct PortRowView: View {
     @State private var isHovered = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            // Line 1: Folder name and port number with optional Stop button
-            HStack {
-                Text(portInfo.folderName)
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundStyle(.primary)
+        HStack(spacing: 12) {
+            // Active indicator
+            Circle()
+                .fill(.green)
+                .frame(width: 8, height: 8)
 
-                Spacer()
+            VStack(alignment: .leading, spacing: 4) {
+                // Line 1: Folder name and port number with optional buttons
+                HStack {
+                    Text(portInfo.folderName)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.primary)
 
-                HStack(spacing: 8) {
-                    Text("Port \(portInfo.port)")
-                        .font(.system(size: 13))
-                        .foregroundStyle(.secondary)
+                    Spacer()
 
-                    if isHovered {
-                        Button(action: onStop) {
-                            Text("Stop")
-                                .font(.system(size: 12, weight: .medium))
+                    HStack(spacing: 8) {
+                        Text(":\(portInfo.port)")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(.secondary)
+
+                        if isHovered {
+                            Button(action: {
+                                if let url = URL(string: "http://localhost:\(portInfo.port)") {
+                                    NSWorkspace.shared.open(url)
+                                }
+                            }) {
+                                Image(systemName: "arrow.up.forward.square")
+                                    .font(.system(size: 12))
+                            }
+                            .buttonStyle(.borderless)
+                            .help("Open in browser")
+
+                            Button(action: onStop) {
+                                Text("Stop")
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .transition(.opacity)
                         }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                        .transition(.opacity)
                     }
                 }
             }
+        }
 
-            // Line 2: Working directory path
-            Text(portInfo.workingDirectory)
-                .font(.system(size: 12))
+                // Line 2: Working directory path
+                Text(portInfo.workingDirectory)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+
+                // Line 3: Process metadata
+                HStack(spacing: 4) {
+                    Text(portInfo.processName)
+                    Text("•")
+                    Text(portInfo.command)
+                    Text("•")
+                    Text(portInfo.formattedUptime)
+                }
+                .font(.system(size: 11))
                 .foregroundStyle(.tertiary)
                 .lineLimit(1)
-                .truncationMode(.middle)
-
-            // Line 3: Process metadata
-            HStack(spacing: 4) {
-                Text(portInfo.processName)
-                Text("•")
-                Text(portInfo.command)
-                Text("•")
-                Text(portInfo.formattedUptime)
             }
-            .font(.system(size: 11))
-            .foregroundStyle(.tertiary)
-            .lineLimit(1)
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
