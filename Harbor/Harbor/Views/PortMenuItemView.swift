@@ -10,6 +10,7 @@ import AppKit
 struct PortMenuItemView: View {
     let portInfo: PortInfo
     let onOpen: () -> Void
+    let onOpenInFinder: () -> Void
     let onStop: () -> Void
 
     @State private var isHovered = false
@@ -59,34 +60,36 @@ struct PortMenuItemView: View {
 
             Spacer()
 
-            // Right actions (vertically centered, icons only)
+            // Right actions (vertically centered, text labels)
             if isHovered {
-                HStack(spacing: 6) {
-                    Button(action: onOpen) {
-                        Image(systemName: "arrow.up.forward.square")
-                            .font(.system(size: 14))
-                            .foregroundStyle(.secondary)
+                HStack(spacing: 8) {
+                    Button(action: onOpenInFinder) {
+                        Text("Finder")
+                            .font(.system(size: 11))
                     }
-                    .buttonStyle(.plain)
-                    .help("Open in browser")
+                    .buttonStyle(.borderless)
+                    .controlSize(.small)
 
                     Button(action: onStop) {
-                        Image(systemName: "stop.fill")
-                            .font(.system(size: 14))
-                            .foregroundStyle(.secondary)
+                        Text("Stop")
+                            .font(.system(size: 11))
                     }
-                    .buttonStyle(.plain)
-                    .help("Stop server")
+                    .buttonStyle(.borderless)
+                    .controlSize(.small)
                 }
                 .padding(.trailing, 8)
                 .transition(.opacity)
             }
         }
         .padding(.vertical, 8)
-        .padding(.horizontal, 12)
+        .padding(.horizontal, 16) // 4px more padding on each side (12 + 4)
         .frame(width: 320, height: 64) // Height for 3 lines
         .background(isHovered ? Color.primary.opacity(0.05) : Color.clear)
         .cornerRadius(6)
+        .contentShape(Rectangle()) // Make entire area clickable
+        .onTapGesture {
+            onOpen()
+        }
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 isHovered = hovering
@@ -99,11 +102,13 @@ struct PortMenuItemView: View {
 class PortMenuItem: NSMenuItem {
     private let portInfo: PortInfo
     private let onOpen: () -> Void
+    private let onOpenInFinder: () -> Void
     private let onStop: () -> Void
 
-    init(portInfo: PortInfo, onOpen: @escaping () -> Void, onStop: @escaping () -> Void) {
+    init(portInfo: PortInfo, onOpen: @escaping () -> Void, onOpenInFinder: @escaping () -> Void, onStop: @escaping () -> Void) {
         self.portInfo = portInfo
         self.onOpen = onOpen
+        self.onOpenInFinder = onOpenInFinder
         self.onStop = onStop
         super.init(title: "", action: nil, keyEquivalent: "")
 
@@ -111,6 +116,7 @@ class PortMenuItem: NSMenuItem {
             rootView: PortMenuItemView(
                 portInfo: portInfo,
                 onOpen: onOpen,
+                onOpenInFinder: onOpenInFinder,
                 onStop: onStop
             )
         )
