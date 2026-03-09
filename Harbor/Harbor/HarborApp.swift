@@ -38,7 +38,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover = NSPopover()
         popover.contentSize = NSSize(width: Constants.popoverWidth, height: Constants.popoverMinHeight)
         popover.behavior = .transient
-        popover.contentViewController = NSHostingController(rootView: PopoverView().environment(viewModel))
+        popover.contentViewController = NSHostingController(
+            rootView: PopoverView()
+                .environment(viewModel)
+                .environment(settingsViewModel)
+        )
 
         // Update badge based on settings
         Task { @MainActor in
