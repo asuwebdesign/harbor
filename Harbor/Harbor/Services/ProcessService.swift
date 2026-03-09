@@ -36,7 +36,7 @@ actor ProcessService {
 
     /// Kills a process with SIGTERM
     func killProcess(pid: Int32) async throws {
-        guard await canKillProcess(pid: pid) else {
+        guard canKillProcess(pid: pid) else {
             throw ProcessServiceError.permissionDenied
         }
 

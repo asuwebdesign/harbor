@@ -7,9 +7,11 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(SettingsViewModel.self) private var viewModel
+    @Environment(SettingsViewModel.self) private var settingsViewModel
 
     var body: some View {
+        @Bindable var viewModel = settingsViewModel
+
         VStack(alignment: .leading, spacing: 24) {
             VStack(alignment: .leading, spacing: 24) {
                 Text("Settings")
