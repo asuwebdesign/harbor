@@ -5,7 +5,6 @@
 
 import Foundation
 
-@Observable
 final class AppStateManager {
     private let defaults: UserDefaults
 
