@@ -16,7 +16,8 @@ struct PortInfo: Identifiable {
 
     /// Extracts the folder name from the working directory path
     var folderName: String {
-        let components = workingDirectory.split(separator: "/")
+        let trimmed = workingDirectory.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        let components = trimmed.split(separator: "/")
         return String(components.last ?? "Unknown")
     }
 
