@@ -54,6 +54,9 @@ final class PortViewModel {
         let range = Constants.portRangeStart...Constants.portRangeEnd
         activePorts = await scanner.scanPortRange(range)
         lastScanTime = Date()
+
+        // Post notification for badge update
+        NotificationCenter.default.post(name: NSNotification.Name("PortsDidUpdate"), object: nil)
     }
 
     /// Kills a specific process by PID
