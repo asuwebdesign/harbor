@@ -213,7 +213,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let count = String(viewModel.activePorts.count)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
-                .baselineOffset: 1 // Slight adjustment for vertical centering
+                .baselineOffset: -2 // Lower by 2 pixels for better vertical alignment
             ]
             button.attributedTitle = NSAttributedString(string: " \(count)", attributes: attributes)
         } else {

@@ -14,16 +14,6 @@ struct PortMenuItemView: View {
 
     @State private var isHovered = false
 
-    private var shortPath: String {
-        let components = portInfo.sanitizedWorkingDirectory.split(separator: "/").map(String.init)
-        if components.count >= 2 {
-            return "\(components[components.count - 2])/\(components[components.count - 1])"
-        } else if components.count == 1 {
-            return components[0]
-        }
-        return portInfo.sanitizedWorkingDirectory
-    }
-
     var body: some View {
         HStack(spacing: 0) {
             // Left content
@@ -32,7 +22,7 @@ struct PortMenuItemView: View {
                 Circle()
                     .fill(.green)
                     .frame(width: 8, height: 8)
-                    .padding(.bottom, 54) // Align with title row
+                    .padding(.bottom, 36) // Align with title row
 
                 VStack(alignment: .leading, spacing: 4) {
                     // Line 1: Port number and title
@@ -53,24 +43,13 @@ struct PortMenuItemView: View {
                         Spacer()
                     }
 
-                    // Line 2: Short path
-                    Text(shortPath)
-                        .font(.system(size: 11))
+                    // Line 2: Command
+                    Text(portInfo.sanitizedCommand)
+                        .font(.system(size: 10))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
-                        .truncationMode(.middle)
 
-                    // Line 3: Process metadata
-                    HStack(spacing: 4) {
-                        Text(portInfo.sanitizedProcessName)
-                        Text("•")
-                        Text(portInfo.sanitizedCommand)
-                    }
-                    .font(.system(size: 10))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-
-                    // Line 4: Duration
+                    // Line 3: Duration
                     Text(portInfo.formattedUptime)
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
@@ -105,7 +84,7 @@ struct PortMenuItemView: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .frame(width: 320, height: 80) // Slightly taller for 4 lines
+        .frame(width: 320, height: 64) // Height for 3 lines
         .background(isHovered ? Color.primary.opacity(0.05) : Color.clear)
         .cornerRadius(6)
         .onHover { hovering in
@@ -136,7 +115,7 @@ class PortMenuItem: NSMenuItem {
             )
         )
 
-        hostingView.frame = NSRect(x: 0, y: 0, width: 320, height: 80)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 320, height: 64)
         self.view = hostingView
     }
 
