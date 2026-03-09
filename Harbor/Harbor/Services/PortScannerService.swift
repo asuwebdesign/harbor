@@ -91,8 +91,12 @@ actor PortScannerService {
 
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
-            // If we get any HTTP response, it's an HTTP server
-            return (response as? HTTPURLResponse) != nil
+            guard let httpResponse = response as? HTTPURLResponse else { return false }
+
+            // Only consider it a web server if it returns 2xx or 3xx status codes
+            // This filters out services that respond with errors (4xx, 5xx)
+            let statusCode = httpResponse.statusCode
+            return (200...399).contains(statusCode)
         } catch {
             // Not an HTTP server, or doesn't respond to HTTP
             return false
