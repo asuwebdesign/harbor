@@ -55,6 +55,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.updateBadge()
             }
         }
+
+        // Observe settings changes to update badge
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("SettingsDidUpdate"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.updateBadge()
+            }
+        }
     }
 
     @objc func togglePopover(_ sender: NSStatusBarButton) {
@@ -98,6 +109,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func openSettings() {
         if settingsWindow == nil {
             let settingsView = SettingsView()
+                .environment(settingsViewModel)
             let hostingController = NSHostingController(rootView: settingsView)
 
             let window = NSWindow(contentViewController: hostingController)

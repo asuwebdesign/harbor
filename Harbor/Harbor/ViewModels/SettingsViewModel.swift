@@ -50,5 +50,8 @@ final class SettingsViewModel {
             launchAtLogin: launchAtLogin
         )
         stateManager.saveSettings(settings)
+
+        // Notify observers that settings changed
+        NotificationCenter.default.post(name: NSNotification.Name("SettingsDidUpdate"), object: nil)
     }
 }
