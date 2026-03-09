@@ -8,7 +8,7 @@ import Foundation
 final class AppStateManager {
     private let defaults: UserDefaults
 
-    init(defaults: UserDefaults = .standard) {
+    nonisolated init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }
 
