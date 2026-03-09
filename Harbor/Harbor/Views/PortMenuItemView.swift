@@ -15,13 +15,13 @@ struct PortMenuItemView: View {
     @State private var isHovered = false
 
     private var shortPath: String {
-        let components = portInfo.workingDirectory.split(separator: "/").map(String.init)
+        let components = portInfo.sanitizedWorkingDirectory.split(separator: "/").map(String.init)
         if components.count >= 2 {
             return "\(components[components.count - 2])/\(components[components.count - 1])"
         } else if components.count == 1 {
             return components[0]
         }
-        return portInfo.workingDirectory
+        return portInfo.sanitizedWorkingDirectory
     }
 
     var body: some View {
@@ -62,9 +62,9 @@ struct PortMenuItemView: View {
 
                     // Line 3: Process metadata
                     HStack(spacing: 4) {
-                        Text(portInfo.processName)
+                        Text(portInfo.sanitizedProcessName)
                         Text("•")
-                        Text(portInfo.command)
+                        Text(portInfo.sanitizedCommand)
                     }
                     .font(.system(size: 10))
                     .foregroundStyle(.secondary)
