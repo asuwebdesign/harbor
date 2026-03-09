@@ -113,6 +113,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     keyEquivalent: ""
                 )
                 stopAllItem.target = self
+                stopAllItem.image = NSImage(systemSymbolName: "stop.fill", accessibilityDescription: "Stop All")
                 menu.addItem(stopAllItem)
             }
         }
