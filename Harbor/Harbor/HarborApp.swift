@@ -19,7 +19,8 @@ struct HarborApp: App {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
-    private var popover: NSPopover!
+    private var menuBarWindow: MenuBarWindow!
+    private var eventMonitor: Any?
     private var settingsWindow: NSWindow?
     private let viewModel = PortViewModel()
     private let settingsViewModel = SettingsViewModel()
@@ -30,23 +31,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: "building.2.crop.circle", accessibilityDescription: "Harbor")
-            button.action = #selector(togglePopover)
+            button.action = #selector(toggleMenu)
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
 
-        // Create popover (no arrow, like WiFi menu)
-        popover = NSPopover()
-        popover.contentSize = NSSize(width: Constants.popoverWidth, height: Constants.popoverMinHeight)
-        popover.behavior = .transient
-        popover.animates = false // No animation
-
-        // Remove arrow/tip for native macOS look
-        let hostingController = NSHostingController(
-            rootView: PopoverView()
-                .environment(viewModel)
-                .environment(settingsViewModel)
+        // Create native menubar window with Liquid Glass aesthetic
+        let windowRect = NSRect(x: 0, y: 0, width: Constants.popoverWidth, height: Constants.popoverMinHeight)
+        menuBarWindow = MenuBarWindow(
+            contentRect: windowRect,
+            backing: .buffered,
+            defer: false
         )
-        popover.contentViewController = hostingController
+
+        // Embed SwiftUI content
+        let hostingView = MenuBarHostingController(
+            rootView: AnyView(
+                PopoverView()
+                    .environment(viewModel)
+                    .environment(settingsViewModel)
+            )
+        )
+
+        if let visualEffectView = menuBarWindow.contentView as? NSVisualEffectView {
+            hostingView.view.frame = visualEffectView.bounds
+            hostingView.view.autoresizingMask = [.width, .height]
+            visualEffectView.addSubview(hostingView.view)
+        }
+
+        // Monitor clicks outside window to dismiss
+        setupEventMonitor()
 
         // Update badge based on settings
         Task { @MainActor in
@@ -76,29 +89,52 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc func togglePopover(_ sender: NSStatusBarButton) {
+    @objc func toggleMenu(_ sender: NSStatusBarButton) {
         guard let event = NSApp.currentEvent else { return }
 
         if event.type == .rightMouseUp {
-            showMenu()
+            showContextMenu()
         } else {
-            if popover.isShown {
-                popover.performClose(sender)
+            if menuBarWindow.isVisible {
+                hideMenu()
             } else {
-                if let button = statusItem.button {
-                    // Refresh immediately when opening
-                    Task {
-                        await viewModel.scanPorts()
-                        await MainActor.run {
-                            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-                        }
-                    }
-                }
+                showMenu()
             }
         }
     }
 
-    @objc func showMenu() {
+    private func showMenu() {
+        guard let button = statusItem.button else { return }
+
+        // Refresh ports before showing
+        Task {
+            await viewModel.scanPorts()
+            await MainActor.run {
+                menuBarWindow.show(below: button)
+            }
+        }
+    }
+
+    private func hideMenu() {
+        menuBarWindow.hide()
+    }
+
+    private func setupEventMonitor() {
+        // Monitor for clicks outside the window
+        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
+            guard let self = self, self.menuBarWindow.isVisible else { return }
+
+            // Check if click is outside the window
+            let clickLocation = event.locationInWindow
+            let windowFrame = self.menuBarWindow.frame
+
+            if !NSPointInRect(NSEvent.mouseLocation, windowFrame) {
+                self.hideMenu()
+            }
+        }
+    }
+
+    @objc func showContextMenu() {
         let menu = NSMenu()
 
         menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
@@ -144,6 +180,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.title = " \(viewModel.activePorts.count)"
         } else {
             button.title = ""
+        }
+    }
+
+    deinit {
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
         }
     }
 }
