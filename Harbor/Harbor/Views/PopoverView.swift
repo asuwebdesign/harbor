@@ -5,9 +5,9 @@
 
 import SwiftUI
 
-enum PopoverTab {
-    case ports
-    case settings
+enum PopoverTab: String, CaseIterable {
+    case ports = "Ports"
+    case settings = "Settings"
 }
 
 struct PopoverView: View {
@@ -39,27 +39,18 @@ struct PopoverView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Tab Bar
-            HStack(spacing: 0) {
-                TabButton(title: "Ports", isSelected: selectedTab == .ports) {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        selectedTab = .ports
-                    }
-                }
-
-                TabButton(title: "Settings", isSelected: selectedTab == .settings) {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        selectedTab = .settings
-                    }
+            // Native macOS tab style using Picker
+            Picker("", selection: $selectedTab) {
+                ForEach(PopoverTab.allCases, id: \.self) { tab in
+                    Text(tab.rawValue).tag(tab)
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.top, 8)
+            .pickerStyle(.segmented)
+            .padding(8)
 
             Divider()
-                .padding(.top, 8)
 
-            // Content
+            // Content (no animation on tab switch)
             Group {
                 if selectedTab == .ports {
                     portsContent
@@ -68,7 +59,6 @@ struct PopoverView: View {
                 }
             }
             .frame(height: contentHeight)
-            .animation(.easeInOut(duration: 0.2), value: contentHeight)
         }
         .frame(width: Constants.popoverWidth)
         .alert("Stop All Servers?", isPresented: $showingStopAllAlert) {
@@ -140,29 +130,6 @@ struct PopoverView: View {
             Spacer()
         }
         .padding(20)
-    }
-}
-
-struct TabButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Text(title)
-                    .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? .primary : .secondary)
-
-                Rectangle()
-                    .fill(isSelected ? Color.accentColor : Color.clear)
-                    .frame(height: 2)
-            }
-        }
-        .buttonStyle(.plain)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 4)
     }
 }
 

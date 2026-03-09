@@ -11,7 +11,17 @@ struct PortRowView: View {
 
     @State private var isHovered = false
     @State private var scrollOffset: CGFloat = 0
-    @State private var needsScrolling = false
+    @State private var isScrolling = false
+
+    private var shortPath: String {
+        let components = portInfo.workingDirectory.split(separator: "/").map(String.init)
+        if components.count >= 2 {
+            return "\(components[components.count - 2])/\(components[components.count - 1])"
+        } else if components.count == 1 {
+            return components[0]
+        }
+        return portInfo.workingDirectory
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -20,8 +30,8 @@ struct PortRowView: View {
                 .fill(.green)
                 .frame(width: 8, height: 8)
 
-            VStack(alignment: .leading, spacing: 4) {
-                // Line 1: Folder name (reduced font size)
+            VStack(alignment: .leading, spacing: 6) {
+                // Line 1: Folder name and actions (fixed width to prevent shift)
                 HStack {
                     Text(portInfo.folderName)
                         .font(.system(size: 14, weight: .semibold))
@@ -29,49 +39,62 @@ struct PortRowView: View {
 
                     Spacer()
 
-                    if isHovered {
-                        Button(action: {
-                            if let url = URL(string: "http://localhost:\(portInfo.port)") {
-                                NSWorkspace.shared.open(url)
+                    // Fixed-width container for actions to prevent layout shift
+                    HStack(spacing: 8) {
+                        if isHovered {
+                            Button(action: {
+                                if let url = URL(string: "http://localhost:\(portInfo.port)") {
+                                    NSWorkspace.shared.open(url)
+                                }
+                            }) {
+                                Text("Open")
+                                    .font(.system(size: 11, weight: .medium))
                             }
-                        }) {
-                            Text("Open")
-                                .font(.system(size: 11, weight: .medium))
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                        .help("Open in browser")
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .help("Open in browser")
 
-                        Button(action: onStop) {
-                            Text("Stop")
-                                .font(.system(size: 11, weight: .medium))
+                            Button(action: onStop) {
+                                Text("Stop")
+                                    .font(.system(size: 11, weight: .medium))
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
                         }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                        .transition(.opacity)
                     }
+                    .frame(width: 120, alignment: .trailing) // Fixed width prevents shift
                 }
 
-                // Line 2: Port number (fixed position, no shifting)
-                Text(":\(portInfo.port)")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.secondary)
+                // Line 2: Port number as badge
+                HStack(spacing: 6) {
+                    Text("\(portInfo.port)")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Color.accentColor)
+                        .cornerRadius(8)
+                }
 
-                // Line 3: Working directory path with ticker scroll
+                // Line 3: Shortened directory path with ticker scroll
                 GeometryReader { geometry in
-                    Text(portInfo.workingDirectory)
+                    Text(shortPath)
                         .font(.system(size: 11))
                         .foregroundStyle(.tertiary)
                         .lineLimit(1)
-                        .fixedSize()
-                        .offset(x: isHovered && needsScrolling ? scrollOffset : 0)
-                        .background(
-                            GeometryReader { textGeometry in
-                                Color.clear.onAppear {
-                                    needsScrolling = textGeometry.size.width > geometry.size.width
-                                }
+                        .offset(x: isScrolling ? scrollOffset : 0)
+                        .onAppear {
+                            if isHovered {
+                                startScrollAnimation(containerWidth: geometry.size.width)
                             }
-                        )
+                        }
+                        .onChange(of: isHovered) { _, newValue in
+                            if newValue {
+                                startScrollAnimation(containerWidth: geometry.size.width)
+                            } else {
+                                stopScrollAnimation()
+                            }
+                        }
                 }
                 .frame(height: 14)
                 .clipped()
@@ -94,21 +117,25 @@ struct PortRowView: View {
         .background(isHovered ? Color.primary.opacity(0.05) : Color.clear)
         .cornerRadius(6)
         .onHover { hovering in
-            withAnimation(.easeInOut(duration: 0.15)) {
-                isHovered = hovering
-            }
+            isHovered = hovering
+        }
+    }
 
-            if hovering && needsScrolling {
-                // Start ticker animation
-                withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: true)) {
-                    scrollOffset = -100 // Scroll left
-                }
-            } else {
-                // Reset position
-                withAnimation(.easeOut(duration: 0.3)) {
-                    scrollOffset = 0
-                }
+    private func startScrollAnimation(containerWidth: CGFloat) {
+        // Only scroll if text is wider than container
+        let textWidth = shortPath.count * 7 // Rough estimate
+        if textWidth > Int(containerWidth) {
+            isScrolling = true
+            withAnimation(.linear(duration: 3.0).repeatForever(autoreverses: true)) {
+                scrollOffset = -CGFloat(textWidth - Int(containerWidth))
             }
+        }
+    }
+
+    private func stopScrollAnimation() {
+        isScrolling = false
+        withAnimation(.easeOut(duration: 0.3)) {
+            scrollOffset = 0
         }
     }
 }

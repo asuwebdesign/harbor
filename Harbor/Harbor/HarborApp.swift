@@ -34,15 +34,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
 
-        // Create popover
+        // Create popover (no arrow, like WiFi menu)
         popover = NSPopover()
         popover.contentSize = NSSize(width: Constants.popoverWidth, height: Constants.popoverMinHeight)
         popover.behavior = .transient
-        popover.contentViewController = NSHostingController(
+        popover.animates = false // No animation
+
+        // Remove arrow/tip for native macOS look
+        let hostingController = NSHostingController(
             rootView: PopoverView()
                 .environment(viewModel)
                 .environment(settingsViewModel)
         )
+        popover.contentViewController = hostingController
 
         // Update badge based on settings
         Task { @MainActor in
