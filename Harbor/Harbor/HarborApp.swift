@@ -41,7 +41,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentViewController = NSHostingController(rootView: PopoverView().environment(viewModel))
 
         // Update badge based on settings
-        updateBadge()
+        Task { @MainActor in
+            updateBadge()
+        }
 
         // Observe port changes to update badge
         NotificationCenter.default.addObserver(
@@ -49,7 +51,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.updateBadge()
+            Task { @MainActor in
+                self?.updateBadge()
+            }
         }
     }
 
