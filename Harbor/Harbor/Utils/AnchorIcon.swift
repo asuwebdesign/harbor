@@ -7,6 +7,7 @@ import AppKit
 
 enum AnchorIcon {
     /// Creates a custom anchor icon for the menubar based on the Lucide anchor SVG
+    /// Reference: https://lucide.dev/icons/anchor
     static func create(size: CGSize = CGSize(width: 18, height: 18)) -> NSImage {
         let image = NSImage(size: size)
 
@@ -14,55 +15,70 @@ enum AnchorIcon {
 
         // Scale factor to fit SVG (24x24) into our size
         let scale = min(size.width / 24, size.height / 24)
+        let offsetX = (size.width - 24 * scale) / 2
+        let offsetY = (size.height - 24 * scale) / 2
+
         let transform = NSAffineTransform()
+        transform.translateX(by: offsetX, yBy: offsetY)
         transform.scale(by: scale)
 
         NSGraphicsContext.current?.saveGraphicsState()
         transform.concat()
 
-        // Use template color (black, will be automatically tinted by system)
+        // Use template color (will be automatically tinted by system)
         NSColor.black.setStroke()
 
-        let path = NSBezierPath()
-        path.lineWidth = 2.0
-        path.lineCapStyle = .round
-        path.lineJoinStyle = .round
+        // Stroke width of 2px (from SVG)
+        let lineWidth: CGFloat = 2.0
 
-        // Path 1: Vertical line (M12 6v16)
-        path.move(to: NSPoint(x: 12, y: 6))
-        path.line(to: NSPoint(x: 12, y: 22))
+        // Path 1: Vertical line (M12 22V8) - from bottom to top where circle starts
+        let verticalLine = NSBezierPath()
+        verticalLine.lineWidth = lineWidth
+        verticalLine.lineCapStyle = .round
+        verticalLine.lineJoinStyle = .round
+        verticalLine.move(to: NSPoint(x: 12, y: 22))
+        verticalLine.line(to: NSPoint(x: 12, y: 8))
+        verticalLine.stroke()
 
-        // Path 2: Anchor curve (m19 13 2-1a9 9 0 0 1-18 0l2 1)
-        // This is a complex curve - we'll draw the anchor arms
-        path.move(to: NSPoint(x: 19, y: 13))
-        path.line(to: NSPoint(x: 21, y: 12))
+        // Path 2: Anchor arms (M5 12H2a10 10 0 0 0 20 0h-3)
+        // This draws the curved bottom part of the anchor
+        let armsPath = NSBezierPath()
+        armsPath.lineWidth = lineWidth
+        armsPath.lineCapStyle = .round
+        armsPath.lineJoinStyle = .round
 
-        // Left curve (arc)
-        let centerY: CGFloat = 12
-        path.appendArc(
-            withCenter: NSPoint(x: 12, y: centerY),
-            radius: 9,
-            startAngle: 0,
-            endAngle: 180,
+        // Start at left arm
+        armsPath.move(to: NSPoint(x: 5, y: 12))
+        armsPath.line(to: NSPoint(x: 2, y: 12))
+
+        // Arc for the anchor bottom (radius 10, center at x:12, y:12)
+        // SVG arc: a10 10 0 0 0 20 0
+        // This is an arc with radius 10, from current point, going 20 units right
+        armsPath.appendArc(
+            withCenter: NSPoint(x: 12, y: 12),
+            radius: 10,
+            startAngle: 180, // Start at left (180 degrees)
+            endAngle: 0,     // End at right (0 degrees)
             clockwise: true
         )
 
-        path.line(to: NSPoint(x: 5, y: 13))
+        // Right arm
+        armsPath.line(to: NSPoint(x: 22, y: 12))
+        armsPath.stroke()
 
-        // Path 3: Horizontal crossbar (M9 11h6)
-        path.move(to: NSPoint(x: 9, y: 11))
-        path.line(to: NSPoint(x: 15, y: 11))
-
-        // Circle at top (cx="12" cy="4" r="2")
-        path.move(to: NSPoint(x: 14, y: 4))
-        path.appendArc(
-            withCenter: NSPoint(x: 12, y: 4),
-            radius: 2,
+        // Path 3: Circle at top (cx="12" cy="5" r="3")
+        let circle = NSBezierPath()
+        circle.lineWidth = lineWidth
+        circle.lineCapStyle = .round
+        circle.lineJoinStyle = .round
+        circle.appendArc(
+            withCenter: NSPoint(x: 12, y: 5),
+            radius: 3,
             startAngle: 0,
-            endAngle: 360
+            endAngle: 360,
+            clockwise: false
         )
-
-        path.stroke()
+        circle.stroke()
 
         NSGraphicsContext.current?.restoreGraphicsState()
 
