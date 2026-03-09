@@ -16,8 +16,8 @@ struct PortMenuItemView: View {
     @State private var isHovered = false
 
     var body: some View {
-        HStack(spacing: 0) {
-            // Left content
+        ZStack(alignment: .trailing) {
+            // Main content
             HStack(spacing: 12) {
                 // Active indicator (aligned with title row)
                 Circle()
@@ -55,12 +55,11 @@ struct PortMenuItemView: View {
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
                 }
+
+                Spacer()
             }
-            .frame(width: 240) // Fixed width for content
 
-            Spacer()
-
-            // Right actions (vertically centered, text labels)
+            // Overlay buttons (only shown on hover)
             if isHovered {
                 HStack(spacing: 4) {
                     Button(action: onOpenInFinder) {
@@ -88,7 +87,7 @@ struct PortMenuItemView: View {
             }
         }
         .padding(.vertical, 8)
-        .padding(.horizontal, 16) // 4px more padding on each side (12 + 4)
+        .padding(.horizontal, 16)
         .frame(width: 320, height: 64) // Height for 3 lines
         .background(isHovered ? Color.primary.opacity(0.05) : Color.clear)
         .cornerRadius(6)
@@ -125,9 +124,10 @@ class PortMenuItem: NSMenuItem {
                 onOpenInFinder: onOpenInFinder,
                 onStop: onStop
             )
+            .padding(.horizontal, 4) // 4px margin on each side
         )
 
-        hostingView.frame = NSRect(x: 0, y: 0, width: 320, height: 64)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 328, height: 64) // 320 + 8 for margins
         self.view = hostingView
     }
 
