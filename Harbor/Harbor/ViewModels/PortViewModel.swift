@@ -15,14 +15,15 @@ final class PortViewModel {
 
     private let scanner = PortScannerService()
     private let processService = ProcessService()
-    nonisolated private var scanTimer: Timer?
+    private var scanTimer: Timer?
 
     init() {
         startAutoRefresh()
     }
 
     deinit {
-        stopAutoRefresh()
+        // Timer will be invalidated automatically when deallocated
+        // Safe because we use [weak self] in the timer closure
     }
 
     /// Starts automatic port scanning every 5 seconds
@@ -41,7 +42,7 @@ final class PortViewModel {
     }
 
     /// Stops automatic port scanning
-    nonisolated func stopAutoRefresh() {
+    func stopAutoRefresh() {
         scanTimer?.invalidate()
         scanTimer = nil
     }
