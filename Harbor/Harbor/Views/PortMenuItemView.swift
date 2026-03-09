@@ -88,7 +88,9 @@ struct PortMenuItemView: View {
                     .background(Color.primary.opacity(0.08))
                     .cornerRadius(4)
                 }
-                .padding(.trailing, 8)
+                .padding(8)
+                .background(.ultraThinMaterial)
+                .cornerRadius(6)
                 .transition(.opacity)
             }
         }

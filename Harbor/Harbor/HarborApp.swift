@@ -79,6 +79,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func buildMenu() {
         let menu = NSMenu()
 
+        // Add heading
+        if !viewModel.activePorts.isEmpty {
+            let headingItem = NSMenuItem(title: "ACTIVE SERVERS", action: nil, keyEquivalent: "")
+            headingItem.isEnabled = false
+
+            // Style the heading
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: 11, weight: .semibold),
+                .foregroundColor: NSColor.secondaryLabelColor
+            ]
+            headingItem.attributedTitle = NSAttributedString(string: "ACTIVE SERVERS", attributes: attributes)
+
+            menu.addItem(headingItem)
+        }
+
         // Add port items
         if viewModel.activePorts.isEmpty {
             let emptyItem = NSMenuItem(title: "No active ports", action: nil, keyEquivalent: "")
