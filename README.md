@@ -57,6 +57,8 @@ Harbor is built with:
 - **MVVM** architecture with Service Layer
 - **Swift Concurrency** for parallel port scanning
 - **AppKit** for menubar integration (NSStatusItem)
+- **Two-stage port detection** - BSD socket test + HTTP verification to identify web servers
+- **Smart process detection** - Uses `lsof -sTCP:LISTEN` to identify actual server processes, not client connections
 
 See [Design Document](docs/plans/2026-03-09-harbor-design.md) for detailed architecture information.
 

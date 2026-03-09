@@ -76,8 +76,9 @@ This filters out non-HTTP services that accept socket connections but aren't web
 
 **Process Metadata Gathering**:
 
+- `lsof -sTCP:LISTEN` - Get PID of listening process (CRITICAL: use `-sTCP:LISTEN` flag to only detect servers, not client connections. Without this, Harbor's HTTP verification creates client connections that would be detected as the port owner)
 - `pwdx` - Primary method for working directory (more reliable)
-- `lsof` - Fallback for working directory, also used for PID lookup
+- `lsof -d cwd` - Fallback for working directory
 - `ps` - Process name, command args, start time
 
 ### String Sanitization
