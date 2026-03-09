@@ -61,7 +61,7 @@ struct PortMenuItemView: View {
                 }
 
                 // Line 2: Port badge
-                Text("\(portInfo.port)")
+                Text(String(portInfo.port))
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 8)

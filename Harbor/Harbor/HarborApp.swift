@@ -208,9 +208,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let button = statusItem.button else { return }
 
         if settingsViewModel.showBadgeCount && !viewModel.activePorts.isEmpty {
-            button.title = " \(viewModel.activePorts.count)"
+            // Use system font for proper menubar alignment
+            let count = String(viewModel.activePorts.count)
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
+                .baselineOffset: 1 // Slight adjustment for vertical centering
+            ]
+            button.attributedTitle = NSAttributedString(string: " \(count)", attributes: attributes)
         } else {
-            button.title = ""
+            button.attributedTitle = NSAttributedString(string: "")
         }
     }
 }
