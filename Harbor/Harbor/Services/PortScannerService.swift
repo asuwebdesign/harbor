@@ -78,30 +78,144 @@ actor PortScannerService {
         )
     }
 
-    // MARK: - Metadata Gathering (stubs for now)
+    // MARK: - Metadata Gathering
 
     private func getPID(forPort port: Int) async -> Int32? {
-        // TODO: Implement in next task
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof")
+        process.arguments = ["-i", ":\(port)", "-t"]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = Pipe() // Suppress errors
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            guard process.terminationStatus == 0 else { return nil }
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            if let pidString = output?.split(separator: "\n").first,
+               let pid = Int32(pidString) {
+                return pid
+            }
+        } catch {
+            return nil
+        }
+
         return nil
     }
 
     private func getProcessName(pid: Int32) async -> String? {
-        // TODO: Implement in next task
-        return nil
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/ps")
+        process.arguments = ["-p", "\(pid)", "-o", "comm="]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = Pipe()
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            guard process.terminationStatus == 0 else { return nil }
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            return output?.isEmpty == false ? output : nil
+        } catch {
+            return nil
+        }
     }
 
     private func getWorkingDirectory(pid: Int32) async -> String? {
-        // TODO: Implement in next task
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof")
+        process.arguments = ["-a", "-p", "\(pid)", "-d", "cwd", "-Fn"]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = Pipe()
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            guard process.terminationStatus == 0 else { return nil }
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8) ?? ""
+
+            // Parse lsof -Fn output (format: "n/path/to/directory")
+            for line in output.split(separator: "\n") {
+                if line.hasPrefix("n") {
+                    return String(line.dropFirst())
+                }
+            }
+        } catch {
+            return nil
+        }
+
         return nil
     }
 
     private func getCommand(pid: Int32) async -> String? {
-        // TODO: Implement in next task
-        return nil
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/ps")
+        process.arguments = ["-p", "\(pid)", "-o", "args="]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = Pipe()
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            guard process.terminationStatus == 0 else { return nil }
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            return output?.isEmpty == false ? output : nil
+        } catch {
+            return nil
+        }
     }
 
     private func getStartTime(pid: Int32) async -> Date? {
-        // TODO: Implement in next task
-        return nil
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/ps")
+        process.arguments = ["-p", "\(pid)", "-o", "lstart="]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = Pipe()
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            guard process.terminationStatus == 0 else { return nil }
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard let dateString = output else { return nil }
+
+            // Parse format: "Mon Jan  2 15:04:05 2006"
+            let formatter = DateFormatter()
+            formatter.dateFormat = "EEE MMM d HH:mm:ss yyyy"
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+
+            return formatter.date(from: dateString)
+        } catch {
+            return nil
+        }
     }
 }
