@@ -25,76 +25,89 @@ struct PortMenuItemView: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Active indicator
-            Circle()
-                .fill(.green)
-                .frame(width: 8, height: 8)
+        HStack(spacing: 0) {
+            // Left content
+            HStack(spacing: 12) {
+                // Active indicator (aligned with title row)
+                Circle()
+                    .fill(.green)
+                    .frame(width: 8, height: 8)
+                    .padding(.bottom, 40) // Align with title row
 
-            VStack(alignment: .leading, spacing: 6) {
-                // Line 1: Folder name and actions
-                HStack {
-                    Text(portInfo.folderName)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.primary)
+                VStack(alignment: .leading, spacing: 4) {
+                    // Line 1: Title and port number
+                    HStack {
+                        Text(portInfo.folderName)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.primary)
 
-                    Spacer()
+                        Spacer()
 
-                    HStack(spacing: 8) {
-                        if isHovered {
-                            Button(action: onOpen) {
-                                Text("Open")
-                                    .font(.system(size: 11, weight: .medium))
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-
-                            Button(action: onStop) {
-                                Text("Stop")
-                                    .font(.system(size: 11, weight: .medium))
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                        }
+                        // Port badge
+                        Text(String(portInfo.port))
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.accentColor)
+                            .cornerRadius(8)
                     }
-                    .frame(width: 120, alignment: .trailing)
-                }
 
-                // Line 2: Port badge
-                Text(String(portInfo.port))
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Color.accentColor)
-                    .cornerRadius(8)
+                    // Line 2: Short path
+                    Text(shortPath)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary) // Increased contrast from .tertiary
+                        .lineLimit(1)
 
-                // Line 3: Short path
-                Text(shortPath)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
+                    // Line 3: Process metadata
+                    HStack(spacing: 4) {
+                        Text(portInfo.processName)
+                        Text("•")
+                        Text(portInfo.command)
+                        Text("•")
+                        Text(portInfo.formattedUptime)
+                    }
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary) // Increased contrast from .tertiary
                     .lineLimit(1)
-
-                // Line 4: Process metadata
-                HStack(spacing: 4) {
-                    Text(portInfo.processName)
-                    Text("•")
-                    Text(portInfo.command)
-                    Text("•")
-                    Text(portInfo.formattedUptime)
                 }
-                .font(.system(size: 10))
-                .foregroundStyle(.tertiary)
-                .lineLimit(1)
+            }
+            .frame(width: 240) // Fixed width for content
+
+            Spacer()
+
+            // Right actions (vertically centered, icons only)
+            if isHovered {
+                HStack(spacing: 6) {
+                    Button(action: onOpen) {
+                        Image(systemName: "arrow.up.forward.square")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Open in browser")
+
+                    Button(action: onStop) {
+                        Image(systemName: "stop.fill")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Stop server")
+                }
+                .padding(.trailing, 8)
+                .transition(.opacity)
             }
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .frame(width: 320)
+        .frame(width: 320, height: 70) // Compact height
         .background(isHovered ? Color.primary.opacity(0.05) : Color.clear)
         .cornerRadius(6)
         .onHover { hovering in
-            isHovered = hovering
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovered = hovering
+            }
         }
     }
 }
@@ -119,7 +132,7 @@ class PortMenuItem: NSMenuItem {
             )
         )
 
-        hostingView.frame = NSRect(x: 0, y: 0, width: 320, height: 90)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 320, height: 70)
         self.view = hostingView
     }
 
