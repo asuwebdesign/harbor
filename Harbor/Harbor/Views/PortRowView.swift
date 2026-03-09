@@ -10,6 +10,8 @@ struct PortRowView: View {
     let onStop: () -> Void
 
     @State private var isHovered = false
+    @State private var scrollOffset: CGFloat = 0
+    @State private var needsScrolling = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -19,50 +21,62 @@ struct PortRowView: View {
                 .frame(width: 8, height: 8)
 
             VStack(alignment: .leading, spacing: 4) {
-                // Line 1: Folder name and port number with optional buttons
+                // Line 1: Folder name (reduced font size)
                 HStack {
                     Text(portInfo.folderName)
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.primary)
 
                     Spacer()
 
-                    HStack(spacing: 8) {
-                        Text(":\(portInfo.port)")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(.secondary)
-
-                        if isHovered {
-                            Button(action: {
-                                if let url = URL(string: "http://localhost:\(portInfo.port)") {
-                                    NSWorkspace.shared.open(url)
-                                }
-                            }) {
-                                Image(systemName: "arrow.up.forward.square")
-                                    .font(.system(size: 12))
+                    if isHovered {
+                        Button(action: {
+                            if let url = URL(string: "http://localhost:\(portInfo.port)") {
+                                NSWorkspace.shared.open(url)
                             }
-                            .buttonStyle(.borderless)
-                            .help("Open in browser")
-
-                            Button(action: onStop) {
-                                Text("Stop")
-                                    .font(.system(size: 12, weight: .medium))
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .transition(.opacity)
+                        }) {
+                            Text("Open")
+                                .font(.system(size: 11, weight: .medium))
                         }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .help("Open in browser")
+
+                        Button(action: onStop) {
+                            Text("Stop")
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .transition(.opacity)
                     }
                 }
 
-                // Line 2: Working directory path
-                Text(portInfo.workingDirectory)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.tertiary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
+                // Line 2: Port number (fixed position, no shifting)
+                Text(":\(portInfo.port)")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.secondary)
 
-                // Line 3: Process metadata
+                // Line 3: Working directory path with ticker scroll
+                GeometryReader { geometry in
+                    Text(portInfo.workingDirectory)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                        .fixedSize()
+                        .offset(x: isHovered && needsScrolling ? scrollOffset : 0)
+                        .background(
+                            GeometryReader { textGeometry in
+                                Color.clear.onAppear {
+                                    needsScrolling = textGeometry.size.width > geometry.size.width
+                                }
+                            }
+                        )
+                }
+                .frame(height: 14)
+                .clipped()
+
+                // Line 4: Process metadata
                 HStack(spacing: 4) {
                     Text(portInfo.processName)
                     Text("•")
@@ -70,7 +84,7 @@ struct PortRowView: View {
                     Text("•")
                     Text(portInfo.formattedUptime)
                 }
-                .font(.system(size: 11))
+                .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
                 .lineLimit(1)
             }
@@ -82,6 +96,18 @@ struct PortRowView: View {
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 isHovered = hovering
+            }
+
+            if hovering && needsScrolling {
+                // Start ticker animation
+                withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: true)) {
+                    scrollOffset = -100 // Scroll left
+                }
+            } else {
+                // Reset position
+                withAnimation(.easeOut(duration: 0.3)) {
+                    scrollOffset = 0
+                }
             }
         }
     }
