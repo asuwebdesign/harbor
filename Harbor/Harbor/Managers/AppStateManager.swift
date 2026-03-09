@@ -5,10 +5,11 @@
 
 import Foundation
 
+@MainActor
 final class AppStateManager {
     private let defaults: UserDefaults
 
-    nonisolated init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }
 

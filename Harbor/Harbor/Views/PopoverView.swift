@@ -51,7 +51,7 @@ struct PopoverView: View {
             Button("Cancel", role: .cancel) {}
             Button("Stop All", role: .destructive) {
                 Task {
-                    try? await viewModel.stopAllPorts()
+                    await viewModel.stopAllPorts()
                 }
             }
         } message: {
