@@ -72,6 +72,8 @@ class PortMenuItem: NSMenuItem {
 
 This filters out non-HTTP services that accept socket connections but aren't web servers.
 
+**Self-PID Filtering**: Harbor filters out its own process ID from scan results to prevent the app from killing itself. The `scanPorts()` method excludes `ProcessInfo.processInfo.processIdentifier` from the active ports list.
+
 **Process Metadata Gathering**:
 
 - `pwdx` - Primary method for working directory (more reliable)
