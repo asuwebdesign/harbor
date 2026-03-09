@@ -32,17 +32,11 @@ struct PortMenuItemView: View {
                 Circle()
                     .fill(.green)
                     .frame(width: 8, height: 8)
-                    .padding(.bottom, 40) // Align with title row
+                    .padding(.bottom, 54) // Align with title row
 
                 VStack(alignment: .leading, spacing: 4) {
-                    // Line 1: Title and port number
-                    HStack {
-                        Text(portInfo.folderName)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.primary)
-
-                        Spacer()
-
+                    // Line 1: Port number and title
+                    HStack(spacing: 8) {
                         // Port badge
                         Text(String(portInfo.port))
                             .font(.system(size: 11, weight: .medium))
@@ -51,25 +45,35 @@ struct PortMenuItemView: View {
                             .padding(.vertical, 2)
                             .background(Color.accentColor)
                             .cornerRadius(8)
+
+                        Text(portInfo.folderName)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.primary)
+
+                        Spacer()
                     }
 
                     // Line 2: Short path
                     Text(shortPath)
                         .font(.system(size: 11))
-                        .foregroundStyle(.secondary) // Increased contrast from .tertiary
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
+                        .truncationMode(.middle)
 
                     // Line 3: Process metadata
                     HStack(spacing: 4) {
                         Text(portInfo.processName)
                         Text("•")
                         Text(portInfo.command)
-                        Text("•")
-                        Text(portInfo.formattedUptime)
                     }
                     .font(.system(size: 10))
-                    .foregroundStyle(.secondary) // Increased contrast from .tertiary
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
+
+                    // Line 4: Duration
+                    Text(portInfo.formattedUptime)
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
                 }
             }
             .frame(width: 240) // Fixed width for content
@@ -101,7 +105,7 @@ struct PortMenuItemView: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .frame(width: 320, height: 70) // Compact height
+        .frame(width: 320, height: 80) // Slightly taller for 4 lines
         .background(isHovered ? Color.primary.opacity(0.05) : Color.clear)
         .cornerRadius(6)
         .onHover { hovering in
@@ -132,7 +136,7 @@ class PortMenuItem: NSMenuItem {
             )
         )
 
-        hostingView.frame = NSRect(x: 0, y: 0, width: 320, height: 70)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 320, height: 80)
         self.view = hostingView
     }
 
