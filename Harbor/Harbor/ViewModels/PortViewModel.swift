@@ -55,8 +55,11 @@ final class PortViewModel {
         let range = Constants.portRangeStart...Constants.portRangeEnd
         let scannedPorts = await scanner.scanPortRange(range)
 
-        // Sort ports numerically (ascending)
-        activePorts = scannedPorts.sorted { $0.port < $1.port }
+        // Filter out Harbor's own PID and sort numerically (ascending)
+        let currentPID = ProcessInfo.processInfo.processIdentifier
+        let filteredPorts = scannedPorts.filter { $0.pid != Int(currentPID) }
+        activePorts = filteredPorts.sorted { $0.port < $1.port }
+
         lastScanTime = Date()
 
         // Post notification for badge update
@@ -65,6 +68,13 @@ final class PortViewModel {
 
     /// Kills a specific process by PID
     func stopPort(_ portInfo: PortInfo) async throws {
+        let currentPID = ProcessInfo.processInfo.processIdentifier
+
+        // Don't kill the Harbor app itself
+        guard portInfo.pid != Int(currentPID) else {
+            throw PortViewModelError.cannotKillSelf
+        }
+
         try await processService.killProcess(pid: Int32(portInfo.pid))
 
         // Refresh immediately after stopping
@@ -73,11 +83,27 @@ final class PortViewModel {
 
     /// Stops all active ports with confirmation
     func stopAllPorts() async {
+        let currentPID = ProcessInfo.processInfo.processIdentifier
+
         for port in activePorts {
+            // Don't kill the Harbor app itself
+            guard port.pid != Int(currentPID) else { continue }
+
             try? await processService.killProcess(pid: Int32(port.pid))
         }
 
         // Refresh after stopping all
         await scanPorts()
+    }
+}
+
+enum PortViewModelError: Error, LocalizedError {
+    case cannotKillSelf
+
+    var errorDescription: String? {
+        switch self {
+        case .cannotKillSelf:
+            return "Cannot stop Harbor's own process"
+        }
     }
 }
