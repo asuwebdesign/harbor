@@ -34,10 +34,10 @@ final class SettingsViewModel {
 
     private let stateManager: AppStateManager
 
-    init(stateManager: AppStateManager = AppStateManager()) {
-        self.stateManager = stateManager
+    init(stateManager: AppStateManager? = nil) {
+        self.stateManager = stateManager ?? AppStateManager()
 
-        let settings = stateManager.loadSettings()
+        let settings = self.stateManager.loadSettings()
         self.showBadgeCount = settings.showBadgeCount
 
         // Get actual launch at login status from system
