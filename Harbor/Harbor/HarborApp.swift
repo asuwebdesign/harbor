@@ -44,10 +44,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         updateBadge()
 
         // Observe port changes to update badge
-        Task { @MainActor in
-            for await _ in NotificationCenter.default.notifications(named: NSNotification.Name("PortsDidUpdate")) {
-                updateBadge()
-            }
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("PortsDidUpdate"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateBadge()
         }
     }
 
