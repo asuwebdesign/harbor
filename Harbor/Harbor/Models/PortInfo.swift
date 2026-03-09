@@ -14,14 +14,24 @@ struct PortInfo: Identifiable {
     let command: String
     let startTime: Date
 
-    /// Extracts the folder name from the working directory path
+    /// Extracts the folder name from the working directory path (parent/child format)
     var folderName: String {
         let trimmed = workingDirectory.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
 
         guard !trimmed.isEmpty else { return "Unknown" }
 
         let components = trimmed.split(separator: "/")
-        return String(components.last ?? "Unknown")
+
+        // Return parent/child format if available (e.g., "Sites/harbor")
+        if components.count >= 2 {
+            let parent = components[components.count - 2]
+            let child = components[components.count - 1]
+            return "\(parent)/\(child)"
+        } else if components.count == 1 {
+            return String(components[0])
+        }
+
+        return "Unknown"
     }
 
     /// Sanitized folder name without control characters
