@@ -59,6 +59,9 @@ actor PortScannerService {
     private func checkPort(_ port: Int) async -> PortInfo? {
         guard await isPortOpen(port) else { return nil }
 
+        // Quick HTTP check - verify it's actually an HTTP server
+        guard await isHTTPServer(port: port) else { return nil }
+
         // Get PID for this port
         guard let pid = await getPID(forPort: port) else { return nil }
 
@@ -76,6 +79,24 @@ actor PortScannerService {
             command: command,
             startTime: startTime
         )
+    }
+
+    /// Quick check to verify if a port is serving HTTP
+    private func isHTTPServer(port: Int) async -> Bool {
+        guard let url = URL(string: "http://localhost:\(port)/") else { return false }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+        request.timeoutInterval = 0.5 // Fast timeout
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            // If we get any HTTP response, it's an HTTP server
+            return (response as? HTTPURLResponse) != nil
+        } catch {
+            // Not an HTTP server, or doesn't respond to HTTP
+            return false
+        }
     }
 
     // MARK: - Metadata Gathering
