@@ -108,7 +108,8 @@ actor PortScannerService {
     private func getPID(forPort port: Int) async -> Int32? {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof")
-        process.arguments = ["-i", ":\(port)", "-t"]
+        // Use -sTCP:LISTEN to only get processes LISTENING on the port (not just connected to it)
+        process.arguments = ["-i", ":\(port)", "-sTCP:LISTEN", "-t"]
 
         let pipe = Pipe()
         process.standardOutput = pipe
