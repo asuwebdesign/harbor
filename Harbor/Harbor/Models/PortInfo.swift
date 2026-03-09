@@ -24,6 +24,11 @@ struct PortInfo: Identifiable {
         return String(components.last ?? "Unknown")
     }
 
+    /// Sanitized folder name without control characters
+    var sanitizedFolderName: String {
+        sanitize(folderName)
+    }
+
     /// Sanitized process name without control characters
     var sanitizedProcessName: String {
         sanitize(processName)

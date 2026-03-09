@@ -37,7 +37,7 @@ struct PortMenuItemView: View {
                             .background(Color.accentColor)
                             .cornerRadius(8)
 
-                        Text(portInfo.folderName)
+                        Text(portInfo.sanitizedFolderName)
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(.primary)
 
