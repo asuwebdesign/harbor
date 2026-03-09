@@ -53,7 +53,10 @@ final class PortViewModel {
         defer { isScanning = false }
 
         let range = Constants.portRangeStart...Constants.portRangeEnd
-        activePorts = await scanner.scanPortRange(range)
+        let scannedPorts = await scanner.scanPortRange(range)
+
+        // Sort ports numerically (ascending)
+        activePorts = scannedPorts.sorted { $0.port < $1.port }
         lastScanTime = Date()
 
         // Post notification for badge update
