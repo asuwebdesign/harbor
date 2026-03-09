@@ -10,7 +10,7 @@ struct SettingsView: View {
     @State private var viewModel = SettingsViewModel()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 24) {
             Text("Settings")
                 .font(.title2)
                 .bold()
@@ -32,8 +32,8 @@ struct SettingsView: View {
                 .keyboardShortcut(.defaultAction)
             }
         }
-        .padding(20)
-        .frame(width: 300, height: 150)
+        .padding(24)
+        .frame(width: 350, height: 180)
     }
 }
 
