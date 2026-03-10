@@ -1,7 +1,7 @@
 # Harbor
 
 <p align="center">
-  <img src="Harbor/Harbor/Assets.xcassets/AppIcon.appiconset/harbor-app-icon-512-2x.png" width="128" height="128" alt="Harbor Icon">
+  <img src="https://raw.githubusercontent.com/markriggan/harbor/main/Harbor/Harbor/Assets.xcassets/AppIcon.appiconset/harbor-app-icon-512-2x.png" width="128" height="128" alt="Harbor Icon">
 </p>
 
 A native macOS menubar utility for managing localhost development servers.
@@ -32,7 +32,7 @@ Harbor automatically checks for updates on launch and will notify you when new v
 brew install --cask harbor
 ```
 
-*Note: Homebrew cask will be available after the first stable release.*
+_Note: Homebrew cask will be available after the first stable release._
 
 ### Building from Source
 
