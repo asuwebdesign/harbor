@@ -19,7 +19,7 @@ struct HoverActionButtonStyle: ButtonStyle {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
+                    .stroke(Color.primary.opacity(0.1), lineWidth: 0.75)
             )
             .cornerRadius(4)
             .onHover { hovering in
