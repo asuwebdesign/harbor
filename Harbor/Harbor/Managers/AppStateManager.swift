@@ -8,6 +8,8 @@ import SwiftUI
 
 @MainActor
 final class AppStateManager {
+    static let shared = AppStateManager()
+
     private let defaults: UserDefaults
 
     // Update tracking
