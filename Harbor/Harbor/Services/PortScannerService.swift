@@ -70,6 +70,7 @@ actor PortScannerService {
         let workingDirectory = await getWorkingDirectory(pid: pid) ?? "Unknown"
         let command = await getCommand(pid: pid) ?? "Unknown"
         let startTime = await getStartTime(pid: pid) ?? Date()
+        let memoryUsageKB = await getMemoryUsage(pid: pid) ?? 0
 
         return PortInfo(
             port: port,
@@ -77,7 +78,8 @@ actor PortScannerService {
             processName: processName,
             workingDirectory: workingDirectory,
             command: command,
-            startTime: startTime
+            startTime: startTime,
+            memoryUsageKB: memoryUsageKB
         )
     }
 
@@ -268,6 +270,33 @@ actor PortScannerService {
             formatter.locale = Locale(identifier: "en_US_POSIX")
 
             return formatter.date(from: dateString)
+        } catch {
+            return nil
+        }
+    }
+
+    private func getMemoryUsage(pid: Int32) async -> Int64? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/ps")
+        // RSS (Resident Set Size) gives us actual memory usage in KB
+        process.arguments = ["-p", "\(pid)", "-o", "rss="]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = Pipe()
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            guard process.terminationStatus == 0 else { return nil }
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard let memoryString = output, let memoryKB = Int64(memoryString) else { return nil }
+
+            return memoryKB
         } catch {
             return nil
         }
