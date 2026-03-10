@@ -87,3 +87,13 @@ iOSInjectionProject/
 
 # macOS
 .DS_Store
+
+# Release artifacts (DMGs should only exist on GitHub Releases)
+*.dmg
+*-Export/
+releases/
+dist/
+
+# Claude Code
+.claude/
+# Note: CLAUDE.md should be committed as it's project documentation
