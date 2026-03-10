@@ -149,6 +149,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
+        // Separator before update item
+        menu.addItem(NSMenuItem.separator())
+
+        // Update menu item (dynamic)
+        let updateItem = NSMenuItem(
+            title: updateMenuItemTitle,
+            action: updateMenuItemEnabled ? #selector(showUpdateDialog) : nil,
+            keyEquivalent: ""
+        )
+        updateItem.isEnabled = updateMenuItemEnabled
+        if !updateMenuItemEnabled {
+            // Gray out disabled items
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: 13),
+                .foregroundColor: NSColor.secondaryLabelColor
+            ]
+            updateItem.attributedTitle = NSAttributedString(string: updateMenuItemTitle, attributes: attributes)
+        }
+        menu.addItem(updateItem)
+
         menu.addItem(NSMenuItem.separator())
 
         // Settings
@@ -304,6 +324,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // Silent failure - show up to date
             updateMenuItemTitle = "You're up to date"
             updateMenuItemEnabled = false
+        }
+    }
+
+    @MainActor
+    @objc private func showUpdateDialog() {
+        guard let release = latestRelease else { return }
+
+        let alert = NSAlert()
+        alert.messageText = "Harbor \(release.version) is Available"
+        alert.informativeText = release.truncatedBody()
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "View Release")
+        alert.addButton(withTitle: "Later")
+
+        let response = alert.runModal()
+
+        if response == .alertFirstButtonReturn {
+            // Open GitHub release page in browser
+            if let url = URL(string: release.htmlUrl) {
+                NSWorkspace.shared.open(url)
+            }
         }
     }
 }
