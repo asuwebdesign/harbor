@@ -18,6 +18,7 @@ This document outlines the process for creating a new Harbor release.
 ### Building the Release
 
 1. **Clean Build in Release Mode**
+
    ```bash
    cd Harbor
    xcodebuild -project Harbor.xcodeproj -scheme Harbor -configuration Release clean build
@@ -33,6 +34,7 @@ This document outlines the process for creating a new Harbor release.
 3. **Create DMG**
 
    **Option A: Manual DMG Creation**
+
    ```bash
    # Create temporary folder for DMG contents
    mkdir -p ~/Desktop/Harbor-DMG
@@ -49,6 +51,7 @@ This document outlines the process for creating a new Harbor release.
    ```
 
    **Option B: Using create-dmg tool** (recommended)
+
    ```bash
    # Install if needed
    brew install create-dmg
@@ -72,7 +75,8 @@ This document outlines the process for creating a new Harbor release.
 1. **Prepare Release Notes**
 
    Create `docs/releases/v1.0.md`:
-   ```markdown
+
+   ````markdown
    # Harbor 1.0 - Initial Release
 
    First stable release of Harbor, a native macOS menubar utility for managing localhost development servers.
@@ -101,18 +105,24 @@ This document outlines the process for creating a new Harbor release.
    ### First Launch
 
    macOS may block Harbor on first launch. Run this command once:
+
    ```bash
    xattr -cr /Applications/Harbor.app
    ```
+   ````
 
    Then right-click Harbor and select Open.
 
    ## Known Issues
 
    None currently. Please report issues at https://github.com/asuwebdesign/harbor/issues
+
+   ```
+
    ```
 
 2. **Create Git Tag**
+
    ```bash
    git tag -a v1.0 -m "Harbor 1.0 - Initial Release"
    git push origin v1.0
@@ -157,15 +167,18 @@ For subsequent releases (1.1, 1.2, etc.):
 ## Troubleshooting
 
 ### DMG won't mount
+
 - Verify DMG integrity: `hdiutil verify Harbor-1.0.dmg`
 - Recreate with different compression: Use `-format UDRW` for testing
 
 ### App crashes on launch
+
 - Check for proper code signing (even without Developer ID)
 - Verify all dependencies are included
 - Test on clean VM or different Mac
 
 ### Update checking fails
+
 - Verify GitHub API rate limits (60 requests/hour unauthenticated)
 - Check that tag format is `vX.Y` (e.g., `v1.0`)
 - Ensure release is published (not draft)
