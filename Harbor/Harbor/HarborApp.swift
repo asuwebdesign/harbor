@@ -23,6 +23,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var aboutWindow: NSWindow?
     private let viewModel = PortViewModel()
     private let settingsViewModel = SettingsViewModel()
+    private let updateChecker = UpdateCheckerService()
+    private var updateMenuItemTitle = "Checking for updates..."
+    private var updateMenuItemEnabled = false
+    private var latestRelease: GitHubRelease?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create status item in menubar
@@ -62,6 +66,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated {
                 self?.updateBadge()
             }
+        }
+
+        // Check for updates after short delay
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
+            await checkForUpdates()
         }
     }
 
@@ -264,6 +274,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.attributedTitle = NSAttributedString(string: " \(count)", attributes: attributes)
         } else {
             button.attributedTitle = NSAttributedString(string: "")
+        }
+    }
+
+    @MainActor
+    private func checkForUpdates() async {
+        // Only check if cooldown period has passed
+        guard AppStateManager.shared.shouldCheckForUpdates() else {
+            updateMenuItemTitle = "You're up to date"
+            updateMenuItemEnabled = false
+            return
+        }
+
+        let result = await updateChecker.checkForUpdates()
+
+        switch result {
+        case .updateAvailable(let release):
+            updateMenuItemTitle = "Update Available - Version \(release.version)"
+            updateMenuItemEnabled = true
+            latestRelease = release
+            AppStateManager.shared.recordUpdateCheck()
+
+        case .upToDate:
+            updateMenuItemTitle = "You're up to date"
+            updateMenuItemEnabled = false
+            AppStateManager.shared.recordUpdateCheck()
+
+        case .error:
+            // Silent failure - show up to date
+            updateMenuItemTitle = "You're up to date"
+            updateMenuItemEnabled = false
         }
     }
 }
