@@ -96,4 +96,4 @@ dist/
 
 # Claude Code
 .claude/
-# Note: CLAUDE.md should be committed as it's project documentation
+CLAUDE.md
