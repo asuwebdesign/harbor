@@ -88,6 +88,7 @@ struct PortMenuItemView: View {
                             Text("Finder")
                                 .font(.system(size: 11))
                         }
+                        .frame(width: 60)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                     }
@@ -99,6 +100,7 @@ struct PortMenuItemView: View {
                             Text("Stop")
                                 .font(.system(size: 11))
                         }
+                        .frame(width: 60)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                     }
