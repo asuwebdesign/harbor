@@ -4,15 +4,33 @@
   <img src="https://github.com/asuwebdesign/harbor/blob/main/Harbor/Harbor/Assets.xcassets/AppIcon.appiconset/harbor-app-icon-512-2x.png?raw=true" width="128" height="128" alt="Harbor Icon">
 </p>
 
-A native macOS menubar utility for managing localhost development servers.
+<p align="center">
+  <strong>A native macOS menubar utility for managing localhost development servers</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/asuwebdesign/harbor/releases/latest">
+    <img src="https://img.shields.io/github/v/release/asuwebdesign/harbor?label=Download&style=for-the-badge" alt="Download">
+  </a>
+</p>
+
+**[Download the latest .dmg from Releases →](https://github.com/asuwebdesign/harbor/releases/latest)**
+
+Harbor automatically scans your localhost ports, displays active development servers in your menubar, and lets you stop them with a single click.
+
+## Requirements
+
+- macOS 14.0 Sonoma or later
+- Compatible with Apple Silicon and Intel Macs
 
 ## Features
 
 - 🔍 **Automatic Port Detection** - Scans ports 3000-9000 to find active localhost servers
-- 📊 **Rich Metadata** - See process name, working directory, command, and uptime for each server
+- 📊 **Rich Metadata** - See process name, working directory, command, uptime, and memory usage for each server
 - ⚡ **Quick Actions** - Stop individual ports or all ports with one click
 - 🎨 **Native macOS Design** - Fully native SwiftUI app with automatic light/dark mode support
 - 🔔 **Badge Count** - Optional menubar badge showing number of active ports
+- 🔄 **Automatic Updates** - Built-in update checking via GitHub releases
 - 🚀 **Lightweight** - Minimal memory footprint with efficient parallel port scanning
 - 🔒 **Secure** - Sandboxed app with minimal permissions required
 
@@ -20,11 +38,27 @@ A native macOS menubar utility for managing localhost development servers.
 
 ### Download (Recommended)
 
-1. Download the latest release from [Releases](https://github.com/asuwebdesign/harbor/releases)
-2. Open the DMG and drag Harbor to your Applications folder
+**[Download Harbor.dmg from Releases →](https://github.com/asuwebdesign/harbor/releases/latest)**
+
+1. Open the DMG file
+2. Drag Harbor to your Applications folder
 3. Launch Harbor from Applications
 
-Harbor automatically checks for updates on launch and will notify you when new versions are available.
+### First Launch
+
+Since Harbor is distributed outside the Mac App Store, macOS may block it on first launch. To fix this:
+
+**Option 1: Remove quarantine flag (Recommended)**
+```bash
+xattr -cr /Applications/Harbor.app
+```
+
+**Option 2: Manual approval**
+1. Right-click Harbor in Applications
+2. Select "Open"
+3. Click "Open" in the security dialog
+
+You only need to do this once. After the first launch, Harbor will open normally.
 
 ### Homebrew
 
@@ -32,7 +66,7 @@ Harbor automatically checks for updates on launch and will notify you when new v
 brew install --cask harbor
 ```
 
-_Note: Homebrew cask will be available after the first stable release._
+_Note: Homebrew cask will be available after v1.0 release._
 
 ### Building from Source
 
