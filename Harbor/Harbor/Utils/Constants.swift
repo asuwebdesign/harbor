@@ -21,4 +21,10 @@ enum Constants {
     // Settings Keys
     nonisolated static let showBadgeCountKey = "showBadgeCount"
     nonisolated static let launchAtLoginKey = "launchAtLogin"
+
+    // GitHub & Updates
+    nonisolated static let githubRepoOwner = "markriggan"
+    nonisolated static let githubRepoName = "harbor"
+    nonisolated static let githubApiBaseURL = "https://api.github.com"
+    nonisolated static let updateCheckInterval: TimeInterval = 86400 // 24 hours
 }
