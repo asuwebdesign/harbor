@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/asuwebdesign/harbor/releases/latest">
-    <img src="https://img.shields.io/github/v/release/asuwebdesign/harbor?label=Download&style=for-the-badge" alt="Download">
+    <img src="https://img.shields.io/badge/Download-v1.1-blue?style=for-the-badge" alt="Download v1.1">
   </a>
 </p>
 

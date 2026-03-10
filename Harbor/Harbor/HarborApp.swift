@@ -17,6 +17,7 @@ struct HarborApp: App {
     }
 }
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var settingsWindow: NSWindow?
@@ -34,7 +35,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if let button = statusItem.button {
             button.image = AnchorIcon.create(size: CGSize(width: 18, height: 18))
-            button.action = #selector(showMenu)
+            button.action = #selector(handleMenuBarClick)
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
 
         // Build initial menu
@@ -75,13 +77,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc func showMenu() {
+    @objc func handleMenuBarClick() {
         // Refresh ports before showing menu
         Task {
             await viewModel.scanPorts()
             await MainActor.run {
                 buildMenu()
-                statusItem.button?.performClick(nil)
+                if let button = statusItem.button {
+                    statusItem.menu?.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.height), in: button)
+                }
             }
         }
     }
@@ -202,10 +206,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         statusItem.menu = menu
 
-        // Reset menu to nil after it's shown so we can rebuild next time
-        DispatchQueue.main.async {
-            self.statusItem.menu = nil
-        }
+        // Set delegate to reset menu after it closes
+        menu.delegate = self
     }
 
     @objc func stopAllPorts() {
@@ -348,5 +350,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 NSWorkspace.shared.open(url)
             }
         }
+    }
+}
+
+// MARK: - NSMenuDelegate
+extension AppDelegate: NSMenuDelegate {
+    func menuDidClose(_ menu: NSMenu) {
+        // Reset menu to nil after it closes so we can rebuild next time
+        statusItem.menu = nil
     }
 }

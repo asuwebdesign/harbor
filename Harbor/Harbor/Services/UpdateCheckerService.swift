@@ -5,7 +5,7 @@
 
 import Foundation
 
-actor UpdateCheckerService {
+struct UpdateCheckerService {
 
     /// Checks GitHub API for the latest release
     func checkForUpdates() async -> UpdateCheckResult {
@@ -41,10 +41,8 @@ actor UpdateCheckerService {
     }
 
     /// Gets current app version from bundle
-    private nonisolated func getCurrentVersion() -> String? {
-        MainActor.assumeIsolated {
-            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-        }
+    private func getCurrentVersion() -> String? {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     }
 
     /// Compares two version strings
