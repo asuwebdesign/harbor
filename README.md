@@ -18,17 +18,28 @@ A native macOS menubar utility for managing localhost development servers.
 
 ## Installation
 
+### Download (Recommended)
+
+1. Download the latest release from [Releases](https://github.com/markriggan/harbor/releases)
+2. Open the DMG and drag Harbor to your Applications folder
+3. Launch Harbor from Applications
+
+Harbor automatically checks for updates on launch and will notify you when new versions are available.
+
+### Homebrew
+
+```bash
+brew install --cask harbor
+```
+
+*Note: Homebrew cask will be available after the first stable release.*
+
 ### Building from Source
 
 1. Clone this repository
 2. Open `Harbor.xcodeproj` in Xcode 15.0+
 3. Build and run (Cmd+R)
 4. Harbor will appear in your menubar
-
-### Requirements
-
-- macOS 14.0 or later
-- Xcode 15.0+ (for building)
 
 ## Usage
 

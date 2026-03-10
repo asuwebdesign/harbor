@@ -154,3 +154,48 @@ npm run dev  # or equivalent
 **Menu not updating**: Ensure `statusItem.menu` is set to `nil` after menu display to allow rebuild on next show
 
 **Windows not centered**: Use `NSScreen.main.visibleFrame` to calculate center position, set `frameOrigin` explicitly
+
+### Releasing a New Version
+
+**Version update:**
+1. In Xcode, update `MARKETING_VERSION` (e.g., 1.0 → 1.1)
+2. Increment `CURRENT_PROJECT_VERSION` by 1
+
+**Create release:**
+```bash
+# Commit version bump
+git add Harbor/Harbor.xcodeproj/project.pbxproj
+git commit -m "chore: bump version to X.X"
+
+# Create and push tag
+git tag vX.X
+git push origin main
+git push origin vX.X
+```
+
+**Build and distribute:**
+1. Product → Archive → Export ("Distribute App" → "Copy App")
+2. Create DMG with Harbor.app
+3. Go to GitHub → Releases → "Create a new release"
+4. Tag: `vX.X`, Title: `Version X.X`
+5. Upload DMG as `Harbor-X.X.dmg`
+6. Add release notes (see template in distribution design doc)
+7. Publish release
+
+**Release notes template:**
+```markdown
+## New Features
+- Feature description
+
+## Bug Fixes
+- Fix description
+
+## Improvements
+- Improvement description
+
+---
+
+**Installation:** Download Harbor-X.X.dmg, drag to Applications, replace existing version.
+```
+
+Update checker will automatically detect the new version on next launch.
