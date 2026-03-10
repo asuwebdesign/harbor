@@ -12,19 +12,48 @@ struct SettingsView: View {
     var body: some View {
         @Bindable var viewModel = settingsViewModel
 
-        VStack(alignment: .leading, spacing: 24) {
-            VStack(alignment: .leading, spacing: 24) {
-                Text("Settings")
-                    .font(.title2)
-                    .bold()
-                    .padding(.top, 4)
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Settings")
+                .font(.title2)
+                .bold()
 
-                VStack(alignment: .leading, spacing: 16) {
-                    Toggle("Show badge count in menubar", isOn: $viewModel.showBadgeCount)
-
-                    Toggle("Launch Harbor at login", isOn: $viewModel.launchAtLogin)
+            // Settings group with macOS style
+            VStack(spacing: 0) {
+                // Badge count setting
+                HStack {
+                    Text("Show badge count in menubar")
+                        .font(.system(size: 13))
+                    Spacer()
+                    Toggle("", isOn: $viewModel.showBadgeCount)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
                 }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(Color.primary.opacity(0.03))
+
+                Divider()
+                    .padding(.leading, 12)
+
+                // Launch at login setting
+                HStack {
+                    Text("Launch Harbor at login")
+                        .font(.system(size: 13))
+                    Spacer()
+                    Toggle("", isOn: $viewModel.launchAtLogin)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(Color.primary.opacity(0.03))
             }
+            .background(Color.primary.opacity(0.03))
+            .cornerRadius(6)
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
+            )
 
             Spacer()
 
@@ -36,10 +65,9 @@ struct SettingsView: View {
                 }
                 .keyboardShortcut(.defaultAction)
             }
-            .padding(.bottom, 4)
         }
         .padding(24)
-        .frame(width: 350, height: 200)
+        .frame(width: 420, height: 220)
     }
 }
 
