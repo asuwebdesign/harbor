@@ -234,6 +234,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let window = NSWindow(contentViewController: hostingController)
             window.title = "Harbor Settings"
             window.styleMask = [.titled, .closable]
+            window.level = .floating
 
             settingsWindow = window
         }
@@ -259,6 +260,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let window = NSWindow(contentViewController: hostingController)
             window.title = "About Harbor"
             window.styleMask = [.titled, .closable]
+            window.level = .floating
 
             aboutWindow = window
         }
