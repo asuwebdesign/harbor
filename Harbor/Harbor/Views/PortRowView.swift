@@ -148,7 +148,8 @@ struct PortRowView: View {
             processName: "node",
             workingDirectory: "/Users/test/projects/my-app",
             command: "npm run dev",
-            startTime: Date().addingTimeInterval(-7200)
+            startTime: Date().addingTimeInterval(-7200),
+            memoryUsageKB: 86016
         ),
         onStop: {}
     )

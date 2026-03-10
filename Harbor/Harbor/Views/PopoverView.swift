@@ -143,8 +143,8 @@ struct PopoverView: View {
         .task {
             // Mock data for preview
             portViewModel.activePorts = [
-                PortInfo(port: 3000, pid: 1, processName: "node", workingDirectory: "/Users/test/my-app", command: "npm run dev", startTime: Date().addingTimeInterval(-3600)),
-                PortInfo(port: 5173, pid: 2, processName: "node", workingDirectory: "/Users/test/vite-app", command: "npm run dev", startTime: Date().addingTimeInterval(-7200))
+                PortInfo(port: 3000, pid: 1, processName: "node", workingDirectory: "/Users/test/my-app", command: "npm run dev", startTime: Date().addingTimeInterval(-3600), memoryUsageKB: 86016),
+                PortInfo(port: 5173, pid: 2, processName: "node", workingDirectory: "/Users/test/vite-app", command: "npm run dev", startTime: Date().addingTimeInterval(-7200), memoryUsageKB: 122880)
             ]
         }
 }
