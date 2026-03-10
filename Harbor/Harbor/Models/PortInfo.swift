@@ -13,6 +13,7 @@ struct PortInfo: Identifiable {
     let workingDirectory: String
     let command: String
     let startTime: Date
+    let memoryUsageKB: Int64 // Memory usage in kilobytes
 
     /// Extracts the folder name from the working directory path (parent/child format)
     var folderName: String {
@@ -101,6 +102,21 @@ struct PortInfo: Identifiable {
             return "\(minutes)m"
         } else {
             return "\(totalSeconds)s"
+        }
+    }
+
+    /// Formats memory usage as human-readable string (e.g., "84 MB", "1.2 GB")
+    var formattedMemory: String {
+        let kb = Double(memoryUsageKB)
+
+        if kb >= 1_048_576 { // >= 1 GB (1024 * 1024 KB)
+            let gb = kb / 1_048_576
+            return String(format: "%.1f GB", gb)
+        } else if kb >= 1024 { // >= 1 MB
+            let mb = kb / 1024
+            return String(format: "%.0f MB", mb)
+        } else {
+            return String(format: "%.0f KB", kb)
         }
     }
 }

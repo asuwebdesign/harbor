@@ -74,8 +74,8 @@ struct PortMenuItemView: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
 
-                    // Line 3: Duration
-                    Text(portInfo.formattedUptime)
+                    // Line 3: Duration and Memory
+                    Text("\(portInfo.formattedUptime) • \(portInfo.formattedMemory)")
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
                 }
