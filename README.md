@@ -1,7 +1,7 @@
 # Harbor
 
 <p align="center">
-  <img src="Harbor/Assets.xcassets/AppIcon.appiconset/icon_512x512.png" width="128" height="128" alt="Harbor Icon">
+  <img src="Harbor/Harbor/Assets.xcassets/AppIcon.appiconset/harbor-app-icon-512-2x.png" width="128" height="128" alt="Harbor Icon">
 </p>
 
 A native macOS menubar utility for managing localhost development servers.
