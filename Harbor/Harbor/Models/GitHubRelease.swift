@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct GitHubRelease: Codable {
+struct GitHubRelease: Codable, Sendable {
     let tagName: String
     let name: String
     let body: String
