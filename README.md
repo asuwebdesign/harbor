@@ -1,7 +1,7 @@
 # Harbor
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/markriggan/harbor/main/Harbor/Harbor/Assets.xcassets/AppIcon.appiconset/harbor-app-icon-512-2x.png" width="128" height="128" alt="Harbor Icon">
+  <img src="https://github.com/asuwebdesign/harbor/blob/main/Harbor/Harbor/Assets.xcassets/AppIcon.appiconset/harbor-app-icon-512-2x.png?raw=true" width="128" height="128" alt="Harbor Icon">
 </p>
 
 A native macOS menubar utility for managing localhost development servers.
@@ -20,7 +20,7 @@ A native macOS menubar utility for managing localhost development servers.
 
 ### Download (Recommended)
 
-1. Download the latest release from [Releases](https://github.com/markriggan/harbor/releases)
+1. Download the latest release from [Releases](https://github.com/asuwebdesign/harbor/releases)
 2. Open the DMG and drag Harbor to your Applications folder
 3. Launch Harbor from Applications
 
