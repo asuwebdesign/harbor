@@ -1,7 +1,7 @@
 # Harbor
 
 <p align="center">
-  <img src="https://github.com/asuwebdesign/harbor/blob/main/docs/screenshots/harbor-icon.png?raw=true" width="128" height="128" alt="Harbor Icon">
+  <img src="docs/screenshots/harbor-icon.png?raw=true" width="128" height="128" alt="Harbor Icon">
 </p>
 
 <p align="center">
@@ -52,7 +52,7 @@ Harbor automatically scans your localhost ports, displays active development ser
 ## Preview
 
 <p align="center">
-  <img src="https://github.com/asuwebdesign/harbor/blob/main/docs/screenshots/harbor-preview.png?raw=true" width="600" alt="Harbor Preview">
+  <img src="docs/screenshots/harbor-preview.png?raw=true" width="600" alt="Harbor Preview">
 </p>
 
 ## Installation
