@@ -6,6 +6,26 @@
 import SwiftUI
 import AppKit
 
+/// Custom button style for hover actions with subtle hover effect
+struct HoverActionButtonStyle: ButtonStyle {
+    @State private var isHovering = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(.ultraThinMaterial)
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(isHovering ? Color.primary.opacity(0.08) : Color.clear)
+            )
+            .cornerRadius(4)
+            .onHover { hovering in
+                withAnimation(.easeInOut(duration: 0.1)) {
+                    isHovering = hovering
+                }
+            }
+    }
+}
+
 /// SwiftUI view for port menu item
 struct PortMenuItemView: View {
     let portInfo: PortInfo
@@ -71,9 +91,7 @@ struct PortMenuItemView: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                     }
-                    .buttonStyle(.plain)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(4)
+                    .buttonStyle(HoverActionButtonStyle())
 
                     Button(action: onStop) {
                         HStack(spacing: 4) {
@@ -84,9 +102,7 @@ struct PortMenuItemView: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                     }
-                    .buttonStyle(.plain)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(4)
+                    .buttonStyle(HoverActionButtonStyle())
                 }
                 .padding(.trailing, 4)
                 .transition(.opacity)
