@@ -17,6 +17,10 @@ struct HoverActionButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(isHovering ? Color.primary.opacity(0.08) : Color.clear)
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
+            )
             .cornerRadius(4)
             .onHover { hovering in
                 withAnimation(.easeInOut(duration: 0.1)) {
