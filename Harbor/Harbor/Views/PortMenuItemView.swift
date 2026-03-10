@@ -61,7 +61,7 @@ struct PortMenuItemView: View {
 
             // Overlay buttons (only shown on hover)
             if isHovered {
-                HStack(spacing: 4) {
+                VStack(spacing: 4) {
                     Button(action: onOpenInFinder) {
                         HStack(spacing: 4) {
                             FolderIcon()
@@ -88,7 +88,7 @@ struct PortMenuItemView: View {
                     .background(.ultraThinMaterial)
                     .cornerRadius(4)
                 }
-                .padding(.trailing, 8)
+                .padding(.trailing, 4)
                 .transition(.opacity)
             }
         }
