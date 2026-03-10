@@ -49,6 +49,12 @@ Harbor automatically scans your localhost ports, displays active development ser
 - 🚀 **Lightweight** - Minimal memory footprint with efficient parallel port scanning
 - 🔒 **Secure** - Sandboxed app with minimal permissions required
 
+## Preview
+
+<p align="center">
+  <img src="https://github.com/asuwebdesign/harbor/blob/main/docs/screenshots/harbor-preview.png?raw=true" width="600" alt="Harbor Preview">
+</p>
+
 ## Installation
 
 ### Download (Recommended)
