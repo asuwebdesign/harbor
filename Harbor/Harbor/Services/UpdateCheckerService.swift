@@ -41,8 +41,10 @@ actor UpdateCheckerService {
     }
 
     /// Gets current app version from bundle
-    private func getCurrentVersion() -> String? {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    private nonisolated func getCurrentVersion() -> String? {
+        MainActor.assumeIsolated {
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        }
     }
 
     /// Compares two version strings
