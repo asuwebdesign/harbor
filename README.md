@@ -14,6 +14,21 @@
   </a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/asuwebdesign/harbor/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+  </a>
+  <a href="https://github.com/asuwebdesign/harbor">
+    <img src="https://img.shields.io/badge/platform-macOS%2014.0%2B-lightgrey.svg" alt="Platform">
+  </a>
+  <a href="https://github.com/asuwebdesign/harbor">
+    <img src="https://img.shields.io/badge/Swift-6.0-orange.svg" alt="Swift 6.0">
+  </a>
+  <a href="https://github.com/asuwebdesign/harbor/stargazers">
+    <img src="https://img.shields.io/github/stars/asuwebdesign/harbor?style=social" alt="GitHub stars">
+  </a>
+</p>
+
 **[Download the latest .dmg from Releases →](https://github.com/asuwebdesign/harbor/releases/latest)**
 
 Harbor automatically scans your localhost ports, displays active development servers in your menubar, and lets you stop them with a single click.
@@ -49,11 +64,13 @@ Harbor automatically scans your localhost ports, displays active development ser
 Since Harbor is distributed outside the Mac App Store, macOS may block it on first launch. To fix this:
 
 **Option 1: Remove quarantine flag (Recommended)**
+
 ```bash
 xattr -cr /Applications/Harbor.app
 ```
 
 **Option 2: Manual approval**
+
 1. Right-click Harbor in Applications
 2. Select "Open"
 3. Click "Open" in the security dialog
